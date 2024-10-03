@@ -1,7 +1,7 @@
 from mesa import Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
-from .agents import Bomberman, Enemy, Rock, Metal, Path
+from .agents import Bomberman, Enemy, Rock, Metal, Path, Meta
 
 class BombermanModel(Model):
     def __init__(self, width, height, num_bombers, num_enemies, map_file):
@@ -20,6 +20,18 @@ class BombermanModel(Model):
             self.schedule.add(enemy)
             self.grid.place_agent(enemy, (width - 2, height - 2))  # Posición inicial, ajustar según el mapa
 
+    def is_cell_empty(self, pos):
+        """
+        Verifica si la celda en la posición dada está vacía.
+        :param pos: Tupla (x, y) de la posición a verificar.
+        :return: True si la celda está vacía (sin agentes), False de lo contrario.
+        """
+        # Obtiene el contenido de la celda en la posición dada
+        contents = self.grid.get_cell_list_contents([pos])
+        
+        # Retorna True si la celda está vacía o solo tiene la meta
+        return all(not isinstance(agent, Rock) for agent in contents)
+
     def load_and_setup_map(self, map_file):
         with open(map_file, 'r') as file:
             game_map = [line.strip().split(',') for line in file.readlines()]
@@ -34,9 +46,6 @@ class BombermanModel(Model):
                 elif cell == 'R':
                     rock = Rock((x, y), self)
                     self.grid.place_agent(rock, (x, y))
-                elif cell == 'R_s':  # Roca con salida
-                    rock = Rock((x, y), self, is_exit=True)
-                    self.grid.place_agent(rock, (x, y))
                 elif cell == 'C':
                     path = Path((x, y), self)
                     self.grid.place_agent(path, (x, y))
@@ -46,6 +55,21 @@ class BombermanModel(Model):
                     bomber = Bomberman((x, y), self)
                     self.schedule.add(bomber)
                     self.grid.place_agent(bomber, (x, y))
+                elif cell == 'META':  # Colocar el agente Meta
+                    meta = Meta((x, y), self)
+                    self.schedule.add(meta)  # Asegúrate de agregarla al schedule
+                    self.grid.place_agent(meta, (x, y))
+                    print(f"Meta colocada en {(x, y)}")
+
+                    meta_pos = meta.pos  # Obtener la posición del agente Meta
+                    cell_contents = self.grid.get_cell_list_contents([meta_pos])  # Contenido de la celda
+
+                    # Verifica que la celda contenga la meta
+                    if any(isinstance(agent, Meta) for agent in cell_contents):
+                        print("El agente Meta está en un camino accesible.")
+                    else:
+                        print("El agente Meta no está en un camino.")
+
 
     def step(self):
         self.schedule.step()

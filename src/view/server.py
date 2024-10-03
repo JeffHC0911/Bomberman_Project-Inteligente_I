@@ -3,7 +3,7 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization import Slider, StaticText, ChartModule, Choice
 from model.model import BombermanModel
-from model.agents import Bomberman, Enemy, Rock, Metal, Path
+from model.agents import Bomberman, Enemy, Rock, Metal, Path, Meta
 
 def agent_portrayal(agent):
     if isinstance(agent, Bomberman):
@@ -11,11 +11,11 @@ def agent_portrayal(agent):
     elif isinstance(agent, Enemy):
         return {"Shape": "circle", "Color": "red", "Filled": "true", "Layer": 2, "r": 0.5}
     elif isinstance(agent, Rock):
-        if agent.is_exit:
-            return {"Shape": "resources/assets/exit.png", "Layer": 1, "scale": 0.9}
         return {"Shape": "resources/assets/pared.png", "Layer": 1, "scale": 0.9}
     elif isinstance(agent, Metal):
         return {"Shape": "resources/assets/metal.png", "Layer": 1, "scale": 0.9}
+    elif isinstance(agent, Meta):
+        return {"Shape": "resources/assets/exit.png", "Layer": 1, "scale": 0.9}
     elif isinstance(agent, Path):
         return {"Shape": "rect", "Color": "green", "Filled": "true", "Layer": 0, "w": 1, "h": 1}
     return {}

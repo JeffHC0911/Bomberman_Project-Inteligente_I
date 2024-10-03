@@ -1,30 +1,37 @@
 from collections import deque
 
-def bfs(model, start, goal):
-    # Cola para almacenar los nodos a visitar
+def breadth_first_search(model, start, goal):
+    print(f"Inicio de BFS: start={start}, goal={goal}")
+
     queue = deque([[start]])
-    # Conjunto para almacenar los nodos visitados
     visited = set([start])
     
     while queue:
-        # Obtener el camino actual
         path = queue.popleft()
-        # Obtener el último nodo del camino
         node = path[-1]
         
-        # Si hemos llegado al objetivo, devolver el camino
+        print(f"Visitando nodo: {node}, camino hasta ahora: {path}")
+
         if node == goal:
+            print("¡Meta alcanzada!") 
             return path
         
-        # Explorar los vecinos del nodo actual
-        for neighbor in model.grid.get_neighborhood(node, moore=False, include_center=False):
-            if neighbor not in visited and model.grid.is_cell_empty(neighbor):
-                # Crear un nuevo camino añadiendo el vecino
+        neighbors = model.grid.get_neighborhood(node, moore=False, include_center=False)
+        print(f"Vecinos de {node}: {neighbors}")
+
+        for neighbor in neighbors:
+            # Verificar si el vecino es accesible
+            is_empty = model.is_cell_empty(neighbor)
+            print(f"Verificando vecino: {neighbor}, vacío: {is_empty}")
+
+            if neighbor not in visited and is_empty:
+                print(f"Agregando vecino: {neighbor} a la cola")
+
                 new_path = list(path)
                 new_path.append(neighbor)
                 queue.append(new_path)
-                # Marcar el vecino como visitado
                 visited.add(neighbor)
-    
-    # Si no se encuentra un camino, devolver None
+                print(f"Nuevo camino: {new_path}")
+
+    print("No se encontró camino a la meta")
     return None
