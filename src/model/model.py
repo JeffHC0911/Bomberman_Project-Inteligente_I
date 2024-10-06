@@ -29,8 +29,8 @@ class BombermanModel(Model):
         # Obtiene el contenido de la celda en la posición dada
         contents = self.grid.get_cell_list_contents([pos])
         
-        # Retorna True si la celda está vacía o solo tiene la meta
-        return all(not isinstance(agent, Rock) for agent in contents)
+        # Retorna True si la celda está vacía o solo tiene caminos o la meta
+        return all(isinstance(agent, (Path, Meta)) for agent in contents)
 
     def load_and_setup_map(self, map_file):
         with open(map_file, 'r') as file:

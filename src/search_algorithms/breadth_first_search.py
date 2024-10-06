@@ -16,6 +16,7 @@ def breadth_first_search(model, start, goal):
             print("¡Meta alcanzada!") 
             return path
         
+        # Obtener vecinos sin movimientos diagonales
         neighbors = model.grid.get_neighborhood(node, moore=False, include_center=False)
         print(f"Vecinos de {node}: {neighbors}")
 

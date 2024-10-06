@@ -25,11 +25,18 @@ class Bomberman(Agent):
             self.algoritmo_ejecutado = True
         
         if self.path and self.direccion_actual < len(self.path):
+            next_step = self.path[self.direccion_actual]
             self.move()
+            print(f"Bomberman {self.unique_id} moviéndose a {next_step}")
+
+        # Verificar si se ha alcanzado la meta
+        if next_step == self.find_exit():
+            print("Bomberman ha alcanzado la meta. Deteniendo la simulación.")
+            self.model.schedule.remove(self)
+            self.model.running = False
 
     def move(self):
         next_step = self.path[self.direccion_actual]
-        print(f"Bomberman {self.unique_id} moviéndose a {next_step}")
         self.model.grid.move_agent(self, next_step)
         self.direccion_actual += 1
 
