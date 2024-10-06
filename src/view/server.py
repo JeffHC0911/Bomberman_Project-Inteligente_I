@@ -48,7 +48,8 @@ server = ModularServer(
         "width": 7, 
         "height": 4, 
         "num_bombers": 0, 
-        "num_enemies": 0, 
+        "num_enemies": 0,
+        "algorithm": Choice(name='Seleccionar algoritmo', value='A*', choices=['A*', 'BFS', 'DFS'], description='Seleccionar algoritmo de búsqueda'), 
         "map_file": Choice(name='Seleccionar mapa', value='resources/maps/map1.txt', choices=['resources/maps/map1.txt', 'resources/maps/map2.txt'], description='Seleccionar mapa'),
     }
 )

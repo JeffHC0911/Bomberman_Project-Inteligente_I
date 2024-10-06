@@ -1,5 +1,6 @@
 from mesa import Agent
 from search_algorithms.breadth_first_search import breadth_first_search
+from search_algorithms.depth_first_search import depth_first_search
 
 class Bomberman(Agent):
     def __init__(self, unique_id, model):
@@ -14,7 +15,7 @@ class Bomberman(Agent):
             print("goal_pos ", goal_pos)
             if goal_pos:
                 print(f"Bomberman {self.unique_id} buscando camino desde {self.pos} a {goal_pos}")
-                self.path = breadth_first_search(self.model, self.pos, goal_pos)
+                self.path = self.select_algorithm(self.pos, goal_pos)
                 print(f"Camino encontrado: {self.path}")
                 if self.path:
                     print(f"Bomberman {self.unique_id} encontró camino: {self.path}")
@@ -51,6 +52,12 @@ class Bomberman(Agent):
                 return agent.pos
         print("No se encontró ninguna meta")  # Mensaje de depuración
         return None
+    
+    def select_algorithm(self, start, goal):
+        if self.model.algorithm == "BFS":
+            return breadth_first_search(self.model, start, goal)
+        elif self.model.algorithm == "DFS":
+            return depth_first_search(self.model, start, goal)
 
 
 
