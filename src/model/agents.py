@@ -1,6 +1,9 @@
 from mesa import Agent
 from search_algorithms.breadth_first_search import breadth_first_search
 from search_algorithms.depth_first_search import depth_first_search
+from search_algorithms.uniform_cost_search import uniform_cost_search
+
+from utils import sort_neighbors
 
 class Bomberman(Agent):
     def __init__(self, unique_id, model):
@@ -54,10 +57,20 @@ class Bomberman(Agent):
         return None
     
     def select_algorithm(self, start, goal):
+        # Obtener la lista de vecinos alrededor de la posición actual del agente
+        neighbors = self.model.grid.get_neighborhood(start, moore=False, include_center=False)
+        
+        # Ordenar los vecinos utilizando la función sort_neighbors y la prioridad del modelo
+        sort_neighbors(neighbors, start, self.model.priority)
+
+        # Llamar al algoritmo de búsqueda apropiado según lo que ha seleccionado el usuario
         if self.model.algorithm == "BFS":
-            return breadth_first_search(self.model, start, goal)
+            return breadth_first_search(self.model, start, goal, self.model.priority)
         elif self.model.algorithm == "DFS":
-            return depth_first_search(self.model, start, goal)
+            return depth_first_search(self.model, start, goal, self.model.priority)
+        elif self.model.algorithm == "UCS":
+            return uniform_cost_search(self.model, start, goal, self.model.priority)
+
 
 
 
@@ -95,6 +108,8 @@ class Meta(Agent):
 class Path(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
+        self.label = None  # Inicializa la etiqueta como None
+        self.visited = 0  # Inicializa el contador de visitas
 
     def step(self):
         pass

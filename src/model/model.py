@@ -1,15 +1,17 @@
 from mesa import Model
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
+from utils import priorities
 
 from search_algorithms import breadth_first_search
 from .agents import Bomberman, Enemy, Rock, Metal, Path, Meta
 
 class BombermanModel(Model):
-    def __init__(self, width, height, num_bombers, num_enemies, algorithm, map_file):
+    def __init__(self, width, height, num_bombers, num_enemies, algorithm, priority, map_file):
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(width, height, torus=False)
         self.algorithm = algorithm
+        self.priority = priorities[priority]  # Usar el diccionario de prioridades
         self.load_and_setup_map(map_file)
 
         for i in range(num_bombers):
@@ -71,6 +73,13 @@ class BombermanModel(Model):
                         print("El agente Meta está en un camino accesible.")
                     else:
                         print("El agente Meta no está en un camino.")
+
+    def label_cell(self, position, label):
+        """Etiquetar la celda en la posición dada con un valor."""
+        cell_contents = self.grid.get_cell_list_contents([position])
+        for agent in cell_contents:
+            if isinstance(agent, Path):  # Puedes ajustar esto si utilizas otro tipo para representar caminos
+                agent.label = label  # Asigna la etiqueta
 
 
     def step(self):

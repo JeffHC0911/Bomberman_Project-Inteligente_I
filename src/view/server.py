@@ -6,19 +6,24 @@ from model.model import BombermanModel
 from model.agents import Bomberman, Enemy, Rock, Metal, Path, Meta
 
 def agent_portrayal(agent):
+    portrayal = {}
     if isinstance(agent, Bomberman):
-        return {"Shape": "resources/assets/bomberman.png", "Layer": 2, "scale": 0.9}
+        portrayal = {"Shape": "resources/assets/bomberman.png", "Layer": 2, "scale": 0.9}
     elif isinstance(agent, Enemy):
-        return {"Shape": "circle", "Color": "red", "Filled": "true", "Layer": 2, "r": 0.5}
+        portrayal = {"Shape": "circle", "Color": "red", "Filled": "true", "Layer": 2, "r": 0.5}
     elif isinstance(agent, Rock):
-        return {"Shape": "resources/assets/pared.png", "Layer": 1, "scale": 0.9}
+        portrayal = {"Shape": "resources/assets/pared.png", "Layer": 1, "scale": 0.9}
     elif isinstance(agent, Metal):
-        return {"Shape": "resources/assets/metal.png", "Layer": 1, "scale": 0.9}
+        portrayal = {"Shape": "resources/assets/metal.png", "Layer": 1, "scale": 0.9}
     elif isinstance(agent, Meta):
-        return {"Shape": "resources/assets/exit.png", "Layer": 1, "scale": 0.9}
+        portrayal = {"Shape": "resources/assets/salida.png", "Layer": 1, "scale": 0.9}
     elif isinstance(agent, Path):
-        return {"Shape": "rect", "Color": "green", "Filled": "true", "Layer": 0, "w": 1, "h": 1}
-    return {}
+        portrayal = {"Shape": "rect", "Color": "green", "Filled": "true", "Layer": 0, "w": 1, "h": 1}
+        portrayal["text"] = str(agent.label) if agent.label is not None else ""
+        portrayal["text_color"] = "black"
+
+    return portrayal
+
 
 def get_map_files():
     map_dir = "resources/maps/"
@@ -38,7 +43,7 @@ def get_map_dimensions(map_file):
 # Obtener dimensiones del mapa por defecto
 default_width, default_height = get_map_dimensions(default_map)
 
-grid = CanvasGrid(agent_portrayal, 7, 4, 400, 400)  # Ajusta el tamaño según tu mapa
+grid = CanvasGrid(agent_portrayal, 7, 5, 400, 400)  # Ajusta el tamaño según tu mapa
 
 server = ModularServer(
     BombermanModel, 
@@ -46,12 +51,13 @@ server = ModularServer(
     "Bomberman AI", 
     {
         "width": 7, 
-        "height": 4, 
+        "height": 5, 
         "num_bombers": 0, 
         "num_enemies": 0,
-        "algorithm": Choice(name='Seleccionar algoritmo', value='A*', choices=['A*', 'BFS', 'DFS'], description='Seleccionar algoritmo de búsqueda'), 
+        "algorithm": Choice(name='Seleccionar algoritmo', value='A*', choices=['UCS', 'BFS', 'DFS'], description='Seleccionar algoritmo de búsqueda'), 
+        "priority": Choice(name='Seleccionar prioridad', value='← ↓ ↑ →', choices=["→ ↓ ↑ ←", "→ ↑ ← ↓", "↑ → ← ↓", "↑ ← ↓ →", "↓ ↑ → ←", "↓ ← → ↑", "← → ↓ ↑", "← ↓ ↑ →"], description='Seleccionar prioridad de movimiento'),
         "map_file": Choice(name='Seleccionar mapa', value='resources/maps/map1.txt', choices=['resources/maps/map1.txt', 'resources/maps/map2.txt'], description='Seleccionar mapa'),
     }
 )
 
-server.port = 8521  # Puerto predeterminado para el servidor de Mesa
+server.port = 8522  # Puerto predeterminado para el servidor de Mesa
