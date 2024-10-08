@@ -2,44 +2,46 @@ import heapq
 from utils import sort_neighbors
 
 def uniform_cost_search(model, start, goal, priority):
-    print(f"Inicio de UCS: start={start}, goal={goal}")
-
-    # Cola de prioridad para almacenar los caminos, ordenada por el costo acumulado
-    queue = [(0, [start])]
+    queue = [(0, 0, start)]
     visited = set()
-    label_counter = 0  # Contador para etiquetas
+    came_from = {start: None}  # Para reconstruir el camino
+    cost_so_far = {start: 0}   # Para mantener track de los costos mínimos
+    label_counter = 0
+    tie_breaker = 0  # Contador para desempatar costos iguales
 
     while queue:
-        cost, path = heapq.heappop(queue)
-        node = path[-1]
+        current_cost, _, current = heapq.heappop(queue)
 
-        print(f"Visitando nodo: {node}, camino hasta ahora: {path}, costo: {cost}")
-
-        if node == goal:
+        if current == goal:
             print("¡Meta alcanzada!")
-            return path
+            # Reconstruir el camino
+            path = []
+            while current:
+                path.append(current)
+                current = came_from[current]
+            return list(reversed(path))
 
-        if node in visited:
+        if current in visited:
             continue
 
-        visited.add(node)
-
-        # Etiquetar la celda visitada
-        model.label_cell(node, label_counter)
+        visited.add(current)
+        model.label_cell(current, label_counter)
         label_counter += 1
 
-        neighbors = model.grid.get_neighborhood(node, moore=False, include_center=False)
-        sorted_neighbors = sort_neighbors(neighbors, node, priority)  # Ordenar vecinos según la prioridad
-
-        print(f"Vecinos de {node}: {sorted_neighbors}")
+        neighbors = model.grid.get_neighborhood(current, moore=False, include_center=False)
+        sorted_neighbors = sort_neighbors(neighbors, current, priority)
 
         for neighbor in sorted_neighbors:
-            if neighbor not in visited and model.is_cell_empty(neighbor):
-                new_cost = cost + 1  # Suponiendo que cada movimiento tiene un costo de 1
-                new_path = list(path)
-                new_path.append(neighbor)
-                heapq.heappush(queue, (new_cost, new_path))
-                print(f"Agregando vecino: {neighbor} a la cola con costo: {new_cost}")
+            if not model.is_cell_empty(neighbor):
+                continue
 
-    print("No se encontró camino a la meta")
+            new_cost = current_cost + 10  # Costo fijo de 10 como especificado
+
+            # Solo agregamos si no hemos visitado o encontramos un camino más corto
+            if neighbor not in cost_so_far or new_cost < cost_so_far[neighbor]:
+                cost_so_far[neighbor] = new_cost
+                came_from[neighbor] = current
+                tie_breaker += 1
+                heapq.heappush(queue, (new_cost, tie_breaker, neighbor))
+
     return None

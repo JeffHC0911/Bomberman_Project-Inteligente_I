@@ -20,7 +20,7 @@ def agent_portrayal(agent):
     elif isinstance(agent, Path):
         portrayal = {"Shape": "rect", "Color": "green", "Filled": "true", "Layer": 0, "w": 1, "h": 1}
         portrayal["text"] = str(agent.label) if agent.label is not None else ""
-        portrayal["text_color"] = "black"
+        portrayal["text_color"] = "blue"
 
     return portrayal
 
@@ -54,7 +54,7 @@ server = ModularServer(
         "height": 5, 
         "num_bombers": 0, 
         "num_enemies": 0,
-        "algorithm": Choice(name='Seleccionar algoritmo', value='A*', choices=['UCS', 'BFS', 'DFS'], description='Seleccionar algoritmo de búsqueda'), 
+        "algorithm": Choice(name='Seleccionar algoritmo', value='BFS', choices=['BFS', 'DFS', 'UCS'], description='Seleccionar algoritmo de búsqueda'), 
         "priority": Choice(name='Seleccionar prioridad', value='Der Aba Arr Izq', choices=["Der Aba Arr Izq", "Der Arr Izq Aba", "Arr Der Izq Aba", "Izq Der Aba Arr", "Izq Aba Arr Der"], description='Seleccionar prioridad de movimiento'),
         "map_file": Choice(name='Seleccionar mapa', value='resources/maps/map1.txt', choices=['resources/maps/map1.txt', 'resources/maps/map2.txt'], description='Seleccionar mapa'),
     }
