@@ -1,13 +1,33 @@
 priorities = { 
-    "← ↓ ↑ →": ["Izquierda", "Abajo", "Arriba", "Derecha"],
-    "→ ↓ ↑ ←": ["Derecha", "Abajo", "Arriba", "Izquierda"],
-    "→ ↑ ← ↓": ["Derecha", "Arriba", "Izquierda", "Abajo"],
-    "↑ → ← ↓": ["Arriba", "Derecha", "Izquierda", "Abajo"],
-    "↓ ↑ → ←": ["Abajo", "Arriba", "Derecha", "Izquierda"],
-    "↑ ← ↓ →": ["Arriba", "Izquierda", "Abajo", "Derecha"],
-    "↓ ← → ↑": ["Abajo", "Izquierda", "Derecha", "Arriba"],
-    "← → ↓ ↑": ["Izquierda", "Derecha", "Abajo", "Arriba"], 
+    "Izq Aba Der Arr": ["Izquierda", "Abajo", "Derecha", "Arriba"],
+    "Izq Aba Arr Der": ["Izquierda", "Abajo", "Arriba", "Derecha"],
+    "Izq Der Aba Arr": ["Izquierda", "Derecha", "Abajo", "Arriba"],
+    "Izq Der Arr Aba": ["Izquierda", "Derecha", "Arriba", "Abajo"],
+    "Izq Arr Aba Der": ["Izquierda", "Arriba", "Abajo", "Derecha"],
+    "Izq Arr Der Aba": ["Izquierda", "Arriba", "Derecha", "Abajo"],
+
+    "Der Aba Izq Arr": ["Derecha", "Abajo", "Izquierda", "Arriba"],
+    "Der Aba Arr Izq": ["Derecha", "Abajo", "Arriba", "Izquierda"],
+    "Der Izq Aba Arr": ["Derecha", "Izquierda", "Abajo", "Arriba"],
+    "Der Izq Arr Aba": ["Derecha", "Izquierda", "Arriba", "Abajo"],
+    "Der Arr Aba Izq": ["Derecha", "Arriba", "Abajo", "Izquierda"],
+    "Der Arr Izq Aba": ["Derecha", "Arriba", "Izquierda", "Abajo"],
+
+    "Arr Aba Izq Der": ["Arriba", "Abajo", "Izquierda", "Derecha"],
+    "Arr Aba Der Izq": ["Arriba", "Abajo", "Derecha", "Izquierda"],
+    "Arr Izq Aba Der": ["Arriba", "Izquierda", "Abajo", "Derecha"],
+    "Arr Izq Der Aba": ["Arriba", "Izquierda", "Derecha", "Abajo"],
+    "Arr Der Aba Izq": ["Arriba", "Derecha", "Abajo", "Izquierda"],
+    "Arr Der Izq Aba": ["Arriba", "Derecha", "Izquierda", "Abajo"],
+
+    "Aba Arr Izq Der": ["Abajo", "Arriba", "Izquierda", "Derecha"],
+    "Aba Arr Der Izq": ["Abajo", "Arriba", "Derecha", "Izquierda"],
+    "Aba Izq Arr Der": ["Abajo", "Izquierda", "Arriba", "Derecha"],
+    "Aba Izq Der Arr": ["Abajo", "Izquierda", "Derecha", "Arriba"],
+    "Aba Der Arr Izq": ["Abajo", "Derecha", "Arriba", "Izquierda"],
+    "Aba Der Izq Arr": ["Abajo", "Derecha", "Izquierda", "Arriba"],
 }
+
 
 def get_priority_index(direction, priority):
     dir_map = {
