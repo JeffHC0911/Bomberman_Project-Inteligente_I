@@ -8,19 +8,19 @@ from model.agents import Bomberman, Enemy, Rock, Metal, Path, Meta
 def agent_portrayal(agent):
     portrayal = {}
     if isinstance(agent, Bomberman):
-        portrayal = {"Shape": "resources/assets/bomberman.png", "Layer": 2, "scale": 0.9}
+        portrayal = {"Shape": "resources/assets/bomberman.png", "Layer": 2, "scale": 1}
     elif isinstance(agent, Enemy):
         portrayal = {"Shape": "circle", "Color": "red", "Filled": "true", "Layer": 2, "r": 0.5}
     elif isinstance(agent, Rock):
-        portrayal = {"Shape": "resources/assets/pared.png", "Layer": 1, "scale": 0.9}
+        portrayal = {"Shape": "resources/assets/pared.png", "Layer": 1, "scale": 1}
     elif isinstance(agent, Metal):
-        portrayal = {"Shape": "resources/assets/metal.png", "Layer": 1, "scale": 0.9}
+        portrayal = {"Shape": "resources/assets/metal2.png", "Layer": 1, "scale": 1}
     elif isinstance(agent, Meta):
-        portrayal = {"Shape": "resources/assets/salida.png", "Layer": 1, "scale": 0.9}
+        portrayal = {"Shape": "resources/assets/salida.png", "Layer": 1, "scale": 1}
     elif isinstance(agent, Path):
-        portrayal = {"Shape": "rect", "Color": "green", "Filled": "true", "Layer": 0, "w": 1, "h": 1}
+        portrayal = {"Shape": "resources/assets/camino1.png", "Layer": 1, "scale": 1}
         portrayal["text"] = str(agent.label) if agent.label is not None else ""
-        portrayal["text_color"] = "blue"
+        portrayal["text_color"] = "black"
 
     return portrayal
 
@@ -43,20 +43,23 @@ def get_map_dimensions(map_file):
 # Obtener dimensiones del mapa por defecto
 default_width, default_height = get_map_dimensions(default_map)
 
-grid = CanvasGrid(agent_portrayal, 7, 5, 400, 400)  # Ajusta el tamaño según tu mapa
+width = 9
+height = 7
+
+grid = CanvasGrid(agent_portrayal, width, height, 600, 600)  # Ajusta el tamaño según tu mapa
 
 server = ModularServer(
     BombermanModel, 
     [grid], 
     "Bomberman AI", 
     {
-        "width": 7, 
-        "height": 5, 
+        "width": width, 
+        "height": height, 
         "num_bombers": 0, 
         "num_enemies": 0,
         "algorithm": Choice(name='Seleccionar algoritmo', value='BFS', choices=['BFS', 'DFS', 'UCS'], description='Seleccionar algoritmo de búsqueda'), 
-        "priority": Choice(name='Seleccionar prioridad', value='Der Aba Arr Izq', choices=["Der Aba Arr Izq", "Der Arr Izq Aba", "Arr Der Izq Aba", "Izq Der Aba Arr", "Izq Aba Arr Der"], description='Seleccionar prioridad de movimiento'),
-        "map_file": Choice(name='Seleccionar mapa', value='resources/maps/map1.txt', choices=['resources/maps/map1.txt', 'resources/maps/map2.txt'], description='Seleccionar mapa'),
+        "priority": Choice(name='Seleccionar prioridad', value='Der Aba Arr Izq', choices=["Der Aba Arr Izq", "Der Arr Izq Aba", "Arr Der Izq Aba", "Izq Der Aba Arr", "Izq Arr Der Aba"], description='Seleccionar prioridad de movimiento'),
+        "map_file": Choice(name='Seleccionar mapa', value='resources/maps/map1.txt', choices=['resources/maps/map1.txt', 'resources/maps/map2.txt', 'resources/maps/map3.txt'], description='Seleccionar mapa'),
     }
 )
 
