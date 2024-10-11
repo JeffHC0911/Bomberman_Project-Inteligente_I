@@ -1,10 +1,38 @@
 import os
+import tkinter as tk
+from tkinter import filedialog
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization import Slider, StaticText, ChartModule, Choice
+from mesa.visualization import Choice
 from model.model import BombermanModel
 from model.agents import Bomberman, Enemy, Rock, Metal, Path, Meta
 
+# Función para cargar el archivo del mapa utilizando tkinter
+def get_map_file_path():
+    root = tk.Tk()
+    root.withdraw()
+    return filedialog.askopenfilename(
+        initialdir="resources/maps/", title="Seleccione un archivo de mapa", filetypes=[("Text Files", "*.txt")]
+    )
+
+# Función para obtener las dimensiones del mapa
+def get_map_dimensions(map_file):
+    with open(map_file, "r") as f:
+        lines = f.readlines()
+        height = len(lines)  # Número de líneas es la altura
+        width = len(lines[0].strip().split(",")) if height > 0 else 0  # Longitud de la primera línea es el ancho
+    return width, height
+
+# Función para cargar el mapa y obtener las dimensiones
+def load_map_dimensions():
+    map_file_path = get_map_file_path()
+    if not map_file_path:
+        print("No se seleccionó ningún archivo de mapa.")
+        exit()
+    width, height = get_map_dimensions(map_file_path)
+    return map_file_path, width, height
+
+# Definir la representación de los agentes
 def agent_portrayal(agent):
     portrayal = {}
     if isinstance(agent, Bomberman):
@@ -21,45 +49,27 @@ def agent_portrayal(agent):
         portrayal = {"Shape": "resources/assets/camino1.png", "Layer": 1, "scale": 1}
         portrayal["text"] = str(agent.label) if agent.label is not None else ""
         portrayal["text_color"] = "black"
-
     return portrayal
 
+# Cargar el mapa por defecto y obtener sus dimensiones
+default_map_file_path, default_width, default_height = load_map_dimensions()
 
-def get_map_files():
-    map_dir = "resources/maps/"
-    return [f for f in os.listdir(map_dir) if f.endswith('.txt')]
+# Inicializar la grilla con el mapa por defecto
+grid = CanvasGrid(agent_portrayal, default_width, default_height, 400, 400)
 
-map_files = get_map_files()
-default_map = map_files[0] if map_files else "map1.txt"
-
-# Función para obtener dimensiones del mapa
-def get_map_dimensions(map_file):
-    with open(os.path.join("resources/maps/", map_file), 'r') as f:
-        lines = f.readlines()
-        height = len(lines)
-        width = len(lines[0].strip())
-    return width, height
-
-# Obtener dimensiones del mapa por defecto
-default_width, default_height = get_map_dimensions(default_map)
-
-width = 9
-height = 7
-
-grid = CanvasGrid(agent_portrayal, width, height, 600, 600)  # Ajusta el tamaño según tu mapa
-
+# Configurar el servidor
 server = ModularServer(
-    BombermanModel, 
-    [grid], 
-    "Bomberman AI", 
+    BombermanModel,
+    [grid],
+    "Bomberman AI",
     {
-        "width": width, 
-        "height": height, 
-        "num_bombers": 0, 
+        "width": default_width,
+        "height": default_height,
+        "num_bombers": 0,
         "num_enemies": 0,
-        "algorithm": Choice(name='Seleccionar algoritmo', value='BFS', choices=['BFS', 'DFS', 'UCS'], description='Seleccionar algoritmo de búsqueda'), 
+        "algorithm": Choice(name='Seleccionar algoritmo', value='BFS', choices=['BFS', 'DFS', 'UCS'], description='Seleccionar algoritmo de búsqueda'),
         "priority": Choice(name='Seleccionar prioridad', value='Der Aba Arr Izq', choices=["Der Aba Arr Izq", "Der Arr Izq Aba", "Arr Der Izq Aba", "Izq Der Aba Arr", "Izq Arr Der Aba"], description='Seleccionar prioridad de movimiento'),
-        "map_file": Choice(name='Seleccionar mapa', value='resources/maps/map1.txt', choices=['resources/maps/map1.txt', 'resources/maps/map2.txt', 'resources/maps/map3.txt'], description='Seleccionar mapa'),
+        "map_file": default_map_file_path
     }
 )
 

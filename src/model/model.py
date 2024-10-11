@@ -59,7 +59,7 @@ class BombermanModel(Model):
                     bomber = Bomberman((x, y), self)
                     self.schedule.add(bomber)
                     self.grid.place_agent(bomber, (x, y))
-                elif cell == 'META':  # Colocar el agente Meta
+                elif cell == 'C_m':  # Colocar el agente Meta
                     meta = Meta((x, y), self)
                     self.schedule.add(meta)  # Asegúrate de agregarla al schedule
                     self.grid.place_agent(meta, (x, y))
