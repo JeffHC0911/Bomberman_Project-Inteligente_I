@@ -15,11 +15,8 @@ class Bomberman(Agent):
     def step(self):
         if not self.algoritmo_ejecutado:
             goal_pos = self.find_exit()
-            print("goal_pos ", goal_pos)
             if goal_pos:
-                print(f"Bomberman {self.unique_id} buscando camino desde {self.pos} a {goal_pos}")
                 self.path = self.select_algorithm(self.pos, goal_pos)
-                print(f"Camino encontrado: {self.path}")
                 if self.path:
                     print(f"Bomberman {self.unique_id} encontró camino: {self.path}")
                 else:
@@ -31,11 +28,9 @@ class Bomberman(Agent):
         if self.path and self.direccion_actual < len(self.path):
             next_step = self.path[self.direccion_actual]
             self.move()
-            print(f"Bomberman {self.unique_id} moviéndose a {next_step}")
 
         # Verificar si se ha alcanzado la meta
         if next_step == self.find_exit():
-            print("Bomberman ha alcanzado la meta. Deteniendo la simulación.")
             self.model.schedule.remove(self)
             self.model.running = False
 
@@ -49,11 +44,8 @@ class Bomberman(Agent):
         Encuentra la posición de la meta en el mapa.
         """
         for agent in self.model.schedule.agents:
-            print(f"Revisando agente: {agent} en posición {agent.pos}, tipo: {type(agent)}")  # Mensaje para depuración
             if isinstance(agent, Meta):
-                print(f"Meta encontrada en {agent.pos}")  # Mensaje de depuración
                 return agent.pos
-        print("No se encontró ninguna meta")  # Mensaje de depuración
         return None
     
     def select_algorithm(self, start, goal):

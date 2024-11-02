@@ -12,7 +12,7 @@ def get_map_file_path():
     root = tk.Tk()
     root.withdraw()
     return filedialog.askopenfilename(
-        initialdir="resources/maps/", title="Seleccione un archivo de mapa", filetypes=[("Text Files", "*.txt")]
+        initialdir="resources/maps/", title="Elige un mapa", filetypes=[("Text Files", "*.txt")]
     )
 
 # Función para obtener las dimensiones del mapa
@@ -55,7 +55,7 @@ def agent_portrayal(agent):
 default_map_file_path, default_width, default_height = load_map_dimensions()
 
 # Inicializar la grilla con el mapa por defecto
-grid = CanvasGrid(agent_portrayal, default_width, default_height, 400, 400)
+grid = CanvasGrid(agent_portrayal, default_width, default_height, 500, 500)
 
 # Configurar el servidor
 server = ModularServer(

@@ -4,10 +4,10 @@ from utils import sort_neighbors
 def uniform_cost_search(model, start, goal, priority):
     queue = [(0, 0, start)]
     visited = set()
-    came_from = {start: None}  # Para reconstruir el camino
-    cost_so_far = {start: 0}   # Para mantener track de los costos mínimos
+    came_from = {start: None}
+    cost_so_far = {start: 0} 
     label_counter = 0
-    tie_breaker = 0  # Contador para desempatar costos iguales
+    tie_breaker = 0 
 
     while queue:
         current_cost, _, current = heapq.heappop(queue)
