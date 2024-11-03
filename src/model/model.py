@@ -34,8 +34,7 @@ class BombermanModel(Model):
                 if not any(isinstance(agent, (Metal, Bomberman)) for agent in contents):
                     self.grid.place_agent(enemy, (x, y))
                     break
-                
-
+    
     def step(self):
         if not self.running:
             return  # Detener si el juego ya no está en ejecución
@@ -53,7 +52,6 @@ class BombermanModel(Model):
                 print("Bomberman y Enemy se encontraron. El juego se detiene.")
                 self.running = False  # Detener el juego
                 break
-
 
     def find_empty_cell(self):
         """
@@ -74,7 +72,7 @@ class BombermanModel(Model):
         contents = self.grid.get_cell_list_contents([pos])
         
         # Retorna True si la celda está vacía o solo tiene caminos o la meta
-        return all(isinstance(agent, (Path, Meta)) for agent in contents)
+        return all(isinstance(agent, (Path, Meta, Rock)) for agent in contents)
 
     def load_and_setup_map(self, map_file):
         with open(map_file, 'r') as file:
@@ -87,9 +85,16 @@ class BombermanModel(Model):
                 if cell == 'M':
                     metal = Metal((x, y), self)
                     self.grid.place_agent(metal, (x, y))
-                elif cell == 'R':
-                    rock = Rock((x, y), self)
-                    self.grid.place_agent(rock, (x, y))
+                else:
+                    # Colocar un camino (Path) en celdas que no contienen Metal
+                    path = Path((x, y), self)
+                    self.schedule.add(path)
+                    self.grid.place_agent(path, (x, y))
+
+                if cell == "R":
+                    rock_agent = Rock(self.schedule.get_agent_count(), self)
+                    self.schedule.add(rock_agent)
+                    self.grid.place_agent(rock_agent, (x, y))
                 elif cell == 'C':
                     path = Path((x, y), self)
                     self.grid.place_agent(path, (x, y))
@@ -121,5 +126,3 @@ class BombermanModel(Model):
             if isinstance(agent, Path):  # Puedes ajustar esto si utilizas otro tipo para representar caminos
                 agent.label = label  # Asigna la etiqueta
 
-
-   

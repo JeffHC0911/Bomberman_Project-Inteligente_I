@@ -5,7 +5,7 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization import Choice
 from model.model import BombermanModel
-from model.agents import Bomberman, Enemy, Rock, Metal, Path, Meta
+from model.agents import Bomberman, Enemy, Rock, Metal, Path, Meta, Bomb, Explosion
 
 # Función para cargar el archivo del mapa utilizando tkinter
 def get_map_file_path():
@@ -49,6 +49,10 @@ def agent_portrayal(agent):
         portrayal = {"Shape": "resources/assets/camino1.png", "Layer": 1, "scale": 1}
         portrayal["text"] = str(agent.label) if agent.label is not None else ""
         portrayal["text_color"] = "black"
+    elif isinstance(agent, Bomb):
+        portrayal = {"Shape": "resources/assets/bomba.png", "Layer": 1, "scale": 1}
+    elif isinstance(agent, Explosion):
+        portrayal = {"Shape": "resources/assets/explosion.png", "Layer": 1, "scale": 1}
     return portrayal
 
 # Cargar el mapa por defecto y obtener sus dimensiones
