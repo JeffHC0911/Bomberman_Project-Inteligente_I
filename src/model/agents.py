@@ -1,4 +1,5 @@
 from mesa import Agent
+import random 
 from search_algorithms.breadth_first_search import breadth_first_search
 from search_algorithms.depth_first_search import depth_first_search
 from search_algorithms.uniform_cost_search import uniform_cost_search
@@ -64,14 +65,28 @@ class Bomberman(Agent):
             return uniform_cost_search(self.model, start, goal, self.model.priority)
 
 
-
-
 class Enemy(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-
+    
     def step(self):
-        pass
+        # Obtener posiciones posibles para moverse
+        possible_moves = self.model.grid.get_neighborhood(
+            self.pos,
+            moore=False,  
+            include_center=False
+        )
+
+        # Filtrar las posiciones que no tienen un agente de tipo Metal
+        valid_moves = [
+            pos for pos in possible_moves 
+            if not any(isinstance(agent, Metal) for agent in self.model.grid.get_cell_list_contents([pos]))
+        ]
+        
+         # Elegir una posición aleatoria de las válidas
+        if valid_moves:
+            new_position = random.choice(valid_moves)
+            self.model.grid.move_agent(self, new_position)
 
 class Rock(Agent):
     def __init__(self, unique_id, model, is_exit=False):

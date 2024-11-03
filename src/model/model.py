@@ -1,4 +1,5 @@
 from mesa import Model
+import random 
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
 from utils import priorities
@@ -22,7 +23,26 @@ class BombermanModel(Model):
         for i in range(num_enemies):
             enemy = Enemy(i + num_bombers, self)
             self.schedule.add(enemy)
-            self.grid.place_agent(enemy, (width - 2, height - 2))  # Posición inicial, ajustar según el mapa
+            
+            # Encuentra una posición inicial válida para el enemigo, que no tenga Metal
+            while True:
+                x = random.randint(0, width - 1)
+                y = random.randint(0, height - 1)
+                contents = self.grid.get_cell_list_contents((x, y))
+                
+                # Solo coloca el enemigo si la celda no contiene Metal ni Bomberman
+                if not any(isinstance(agent, (Metal, Bomberman)) for agent in contents):
+                    self.grid.place_agent(enemy, (x, y))
+                    break
+
+    def find_empty_cell(self):
+        """
+        Encuentra una celda vacía aleatoria en el grid.
+        :return: Una tupla (x, y) con la posición de una celda vacía.
+        """
+        empty_cells = [(x, y) for x in range(self.grid.width) for y in range(self.grid.height) if self.is_cell_empty((x, y))]
+        return random.choice(empty_cells) if empty_cells else (0, 0)
+
 
     def is_cell_empty(self, pos):
         """

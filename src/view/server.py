@@ -38,7 +38,7 @@ def agent_portrayal(agent):
     if isinstance(agent, Bomberman):
         portrayal = {"Shape": "resources/assets/bomberman.png", "Layer": 2, "scale": 1}
     elif isinstance(agent, Enemy):
-        portrayal = {"Shape": "circle", "Color": "red", "Filled": "true", "Layer": 2, "r": 0.5}
+         portrayal = {"Shape": "resources/assets/enemigo.png", "Layer": 2, "scale": 1}
     elif isinstance(agent, Rock):
         portrayal = {"Shape": "resources/assets/pared.png", "Layer": 1, "scale": 1}
     elif isinstance(agent, Metal):
@@ -66,7 +66,7 @@ server = ModularServer(
         "width": default_width,
         "height": default_height,
         "num_bombers": 0,
-        "num_enemies": 0,
+        "num_enemies": 1,
         "algorithm": Choice(name='Seleccionar algoritmo', value='BFS', choices=['BFS', 'DFS', 'UCS'], description='Seleccionar algoritmo de búsqueda'),
         "priority": Choice(name='Seleccionar prioridad', value='Der Aba Arr Izq', choices=["Der Aba Arr Izq", "Der Arr Izq Aba", "Arr Der Izq Aba", "Izq Der Aba Arr", "Izq Arr Der Aba"], description='Seleccionar prioridad de movimiento'),
         "map_file": default_map_file_path
