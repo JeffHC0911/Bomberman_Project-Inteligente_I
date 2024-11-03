@@ -25,6 +25,8 @@ class Bomberman(Agent):
             else:
                 print("No se encontró la salida")
             self.algoritmo_ejecutado = True
+
+        next_step = None  
         
         if self.path and self.direccion_actual < len(self.path):
             next_step = self.path[self.direccion_actual]

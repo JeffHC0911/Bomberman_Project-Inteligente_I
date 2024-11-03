@@ -34,6 +34,26 @@ class BombermanModel(Model):
                 if not any(isinstance(agent, (Metal, Bomberman)) for agent in contents):
                     self.grid.place_agent(enemy, (x, y))
                     break
+                
+
+    def step(self):
+        if not self.running:
+            return  # Detener si el juego ya no está en ejecución
+        
+        # Ejecutar los pasos de los agentes
+        self.schedule.step()
+        
+        # Verificar si Bomberman y algún enemigo están en la misma posición
+        for cell in self.grid.coord_iter():
+            cell_contents = cell[0]
+            bomber_present = any(isinstance(agent, Bomberman) for agent in cell_contents)
+            enemy_present = any(isinstance(agent, Enemy) for agent in cell_contents)
+            
+            if bomber_present and enemy_present:
+                print("Bomberman y Enemy se encontraron. El juego se detiene.")
+                self.running = False  # Detener el juego
+                break
+
 
     def find_empty_cell(self):
         """
@@ -102,5 +122,4 @@ class BombermanModel(Model):
                 agent.label = label  # Asigna la etiqueta
 
 
-    def step(self):
-        self.schedule.step()
+   
