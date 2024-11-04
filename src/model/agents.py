@@ -153,7 +153,7 @@ class Enemy(Agent):
         # Filtrar las posiciones que no tienen un agente de tipo Metal
         valid_moves = [
             pos for pos in possible_moves 
-            if not any(isinstance(agent, Metal) for agent in self.model.grid.get_cell_list_contents([pos]))
+            if not any(isinstance(agent, (Metal, Rock)) for agent in self.model.grid.get_cell_list_contents([pos]))
         ]
         
          # Elegir una posición aleatoria de las válidas
