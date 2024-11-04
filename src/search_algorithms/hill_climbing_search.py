@@ -1,6 +1,5 @@
 import math
-from utils import sort_neighbors  # Asegúrate de importar correctamente
-
+from utils import sort_neighbors
 
 def heuristic(pos, goal, heuristic_type="manhattan"):
     """Calcula la distancia heurística entre dos posiciones."""
@@ -11,52 +10,43 @@ def heuristic(pos, goal, heuristic_type="manhattan"):
     else:
         raise ValueError("Tipo de heurística no reconocido. Use 'manhattan' o 'euclidean'.")
 
-
 def hill_climbing_search(model, start, goal, priority, heuristic_type="manhattan"):
-    current = start
-    visited = set()
-    came_from = {start: None}
-    path = [start]
+    current_pos = start
+    path = [start]  # Mantiene el camino recorrido
+    visited = set([start])  # Almacena los nodos visitados para evitar revisitas
     label_counter = 0
 
-    print(f"Inicio de HCS: start={start}, goal={goal}")
+    print(f"Inicio de Hill Climbing: start={start}, goal={goal}")
 
-    while current != goal:
-        visited.add(current)
-        model.label_cell(current, label_counter)
+    while current_pos != goal:
+        # Etiquetamos el nodo actual para visualización
+        model.label_cell(current_pos, label_counter)
         label_counter += 1
 
-        # Obtener los vecinos ordenados de acuerdo a la prioridad
-        neighbors = model.grid.get_neighborhood(current, moore=False, include_center=False)
-        sorted_neighbors = sort_neighbors(neighbors, current, priority)
+        # Obtener y ordenar los vecinos según prioridad
+        neighbors = model.grid.get_neighborhood(current_pos, moore=False, include_center=False)
+        sorted_neighbors = sort_neighbors(neighbors, current_pos, priority)
 
-        # Filtrar solo los vecinos accesibles
-        valid_neighbors = [
-            neighbor for neighbor in sorted_neighbors 
-            if model.is_cell_empty(neighbor) and neighbor not in visited
-        ]
+        # Inicializamos variables para encontrar el mejor vecino
+        best_neighbor = None
+        best_heuristic = float("inf")
 
-        if not valid_neighbors:
-            print("Sin vecinos válidos. No se puede avanzar.")
-            return None, list(visited)
+        # Buscar el vecino con la mejor heurística
+        for neighbor in sorted_neighbors:
+            if neighbor not in visited and model.is_cell_empty(neighbor):
+                h = heuristic(neighbor, goal, heuristic_type)
+                if h < best_heuristic:
+                    best_heuristic = h
+                    best_neighbor = neighbor
 
-        # Seleccionar el vecino con menor valor heurístico
-        next_move = min(valid_neighbors, key=lambda pos: heuristic(pos, goal, heuristic_type))
+        # Si no hay vecino válido o el mejor vecino no mejora la heurística, termina la búsqueda
+        if best_neighbor is None or best_heuristic >= heuristic(current_pos, goal, heuristic_type):
+            print("No se encontró un camino directo al objetivo.")
+            return None, list(visited)  # Retorna None en caso de no hallar un camino
 
-        # Verificar si el próximo movimiento mejora la distancia al objetivo
-        if heuristic(next_move, goal, heuristic_type) >= heuristic(current, goal, heuristic_type):
-            print("No se encontraron mejores movimientos. Hill climbing terminó.")
-            return None, list(visited)
+        # Avanzar al mejor vecino y actualizar estructuras
+        current_pos = best_neighbor
+        path.append(current_pos)
+        visited.add(current_pos)
 
-        # Actualizar el diccionario de movimientos
-        came_from[next_move] = current
-        path.append(next_move)
-        current = next_move
-
-    # Reconstruir el camino hacia el objetivo
-    path = []
-    while current is not None:
-        path.append(current)
-        current = came_from[current]
-
-    return list(reversed(path)), list(visited)
+    return path, list(visited)  # Retorna el camino encontrado y los nodos visitados

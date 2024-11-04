@@ -5,6 +5,7 @@ from search_algorithms.depth_first_search import depth_first_search
 from search_algorithms.uniform_cost_search import uniform_cost_search
 from search_algorithms.hill_climbing_search import hill_climbing_search
 from search_algorithms.a_start_search import a_star_search
+from search_algorithms.beam_search import beam_search
 
 from utils import sort_neighbors
 
@@ -137,6 +138,10 @@ class Bomberman(Agent):
             return uniform_cost_search(self.model, start, goal, self.model.priority)
         elif self.model.algorithm == "A*":
             return a_star_search(self.model, start, goal, self.model.priority)
+        elif self.model.algorithm == "HCS":
+            return hill_climbing_search(self.model, start, goal, self.model.priority)
+        elif self.model.algorithm == "BS":
+            return beam_search(self.model, start, goal, self.model.priority)
         else:
             return []
 
