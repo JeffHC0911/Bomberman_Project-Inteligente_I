@@ -3,6 +3,7 @@ import random
 from search_algorithms.breadth_first_search import breadth_first_search
 from search_algorithms.depth_first_search import depth_first_search
 from search_algorithms.uniform_cost_search import uniform_cost_search
+from search_algorithms.hill_climbing_search import hill_climbing_search
 
 from utils import sort_neighbors
 
