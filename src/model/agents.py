@@ -23,6 +23,8 @@ class Bomberman(Agent):
             goal_pos = self.find_exit()
             if goal_pos:
                 self.path = self.select_algorithm(self.pos, goal_pos)
+                if self.path is None:  # Comprobar si path es None
+                    self.path = []  # Reiniciar a lista vacía
                 self.rocks = [pos for pos in self.path if any(isinstance(agent, Rock) 
                             for agent in self.model.grid.get_cell_list_contents([pos]))]
                 if self.path:
@@ -33,8 +35,7 @@ class Bomberman(Agent):
             else:
                 print("No se encontró la salida")
             self.algoritmo_ejecutado = True
-            return  # Asegúrate de que se retorna para no ejecutar más lógica
-        next_position = None
+            return
 
         # Comprobar si está esperando la explosión
         self.check_explosion_status()
@@ -132,6 +133,8 @@ class Bomberman(Agent):
             return depth_first_search(self.model, start, goal, self.model.priority)
         elif self.model.algorithm == "UCS":
             return uniform_cost_search(self.model, start, goal, self.model.priority)
+        else:
+            return []
 
 
 
