@@ -50,3 +50,8 @@ def sort_neighbors(neighbors, start, priority):
     sorted_neighbors = sorted(neighbors_with_directions, key=lambda x: get_priority_index(x[1], priority))
     return [neighbor for neighbor, direction in sorted_neighbors]
 
+def manhattan_distance(goal, neighbor):
+    return (abs(goal[0] - neighbor[0]) + abs(goal[1] - neighbor[1])) * 10
+
+def euclidean_distance(goal, neighbor):
+    return (((goal[0] - neighbor[0]) ** 2 + (goal[1] - neighbor[1]) ** 2) ** 0.5) * 10
