@@ -1,71 +1,77 @@
-import math
-from utils import sort_neighbors
+import heapq
+from utils import manhattan_distance, sort_neighbors
 
-def heuristic(pos, goal, heuristic_type="manhattan"):
-    """Calcula la distancia heurística entre dos posiciones."""
-    if heuristic_type == "manhattan":
-        return abs(pos[0] - goal[0]) + abs(pos[1] - goal[1])
-    elif heuristic_type == "euclidean":
-        return math.sqrt((pos[0] - goal[0]) ** 2 + (pos[1] - goal[1]) ** 2)
-    else:
-        raise ValueError("Tipo de heurística no reconocido. Use 'manhattan' o 'euclidean'.")
+def beam_search(model, start, goal, priority, k=2):
+    print(f"Inicio de Beam Search: start={start}, goal={goal}, ancho del haz k={k}")
 
-def get_cost(agent):
-    """Determina el costo de moverse a una celda en función del tipo de agente."""
-    from agents import GrassAgent, RockAgent, MetalAgent, BorderAgent
+    # Inicialización
+    open_levels = {0: [(start, manhattan_distance(goal, start))]}
+    visited = set()  # Conjunto de nodos visitados
+    came_from = {start: None}
+    g_score = {start: 0}
+    exploration_order = -1  # Contador para el orden de exploración
+    level = 0
 
-    if isinstance(agent, GrassAgent):
-        return 10
-    elif isinstance(agent, (RockAgent, MetalAgent, BorderAgent)):
-        return float("inf")
-    return 1  # Costo por defecto
+    while open_levels:
+        # Obtenemos los nodos actuales de este nivel y los ordenamos por heurística
+        current_level = open_levels.pop(level, [])
+        
+        # Si no hay nodos para procesar, avanzamos al siguiente nivel
+        if not current_level:
+            level += 1
+            continue
+        
+        # Ordenamos los nodos actuales por la heurística y limitamos al ancho del haz `k`
+        current_level.sort(key=lambda x: x[1])
+        next_level_candidates = current_level[:k]
 
-def beam_search(model, start, goal, priority, heuristic_type="manhattan", beam_width=4):
-    current_pos = start
-    path = [start]
-    visited = set([start])
-    visited_order = [start]
-    label_counter = 0
+        # Marcamos los nodos seleccionados y los procesamos
+        for current, _ in next_level_candidates:
+            # Etiquetado de exploración y registro como visitado
+            exploration_order += 1
+            model.label_cell(current, exploration_order)
+            visited.add(current)
+            
+            # Si llegamos al objetivo, reconstruimos el camino
+            if current == goal:
+                path = []
+                while current is not None:
+                    path.append(current)
+                    current = came_from[current]
+                return path[::-1]
 
-    print(f"Inicio de Beam Search: start={start}, goal={goal}, beam_width={beam_width}")
+            # Obtener vecinos ordenados por la prioridad
+            neighbors = model.grid.get_neighborhood(current, moore=False, include_center=False)
+            sort_neighbors(neighbors, current, priority)
 
-    # Cola de prioridad inicial
-    queue = [(heuristic(start, goal, heuristic_type), start, [start])]
+            # Agregamos vecinos válidos a la siguiente capa
+            new_level = []
+            for neighbor in neighbors:
+                # Verificamos si el vecino es accesible y no visitado
+                if not model.is_cell_empty(neighbor) or neighbor in visited:
+                    continue
 
-    while queue:
-        next_level = []
+                # Calculamos el nuevo g_score
+                tentative_g_score = g_score[current] + 10
 
-        # Expansión de nodos según el ancho del haz
-        for _ in range(min(beam_width, len(queue))):
-            _, current_pos, path_so_far = queue.pop(0)
+                # Solo añadimos si este es el camino óptimo al vecino
+                if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
+                    g_score[neighbor] = tentative_g_score
+                    came_from[neighbor] = current
 
-            # Etiquetado de celdas visitadas en el modelo
-            model.label_cell(current_pos, label_counter)
-            label_counter += 1
+                    # Añadir a los candidatos del siguiente nivel con su puntaje
+                    heuristic = manhattan_distance(goal, neighbor)
+                    new_level.append((neighbor, heuristic + tentative_g_score))
 
-            # Comprobar si alcanzamos el objetivo
-            if current_pos == goal:
-                return (path_so_far, visited_order)
+            # Añadimos los nodos del nuevo nivel al diccionario `open_levels`
+            next_level = level + 1
+            if next_level in open_levels:
+                open_levels[next_level].extend(new_level)
+            else:
+                open_levels[next_level] = new_level
 
-            # Obtener vecinos ordenados por prioridad
-            neighbors = model.grid.get_neighborhood(current_pos, moore=False, include_center=False)
-            sorted_neighbors = sort_neighbors(neighbors, current_pos, priority)
+        # Avanzamos al siguiente nivel
+        level += 1
 
-            # Filtrar vecinos y calcular costos
-            for neighbor in sorted_neighbors:
-                if neighbor not in visited:
-                    cellmates = model.grid.get_cell_list_contents([neighbor])
-                    move_cost = sum(get_cost(agent) for agent in cellmates)
-
-                    if move_cost < float("inf"):
-                        h = heuristic(neighbor, goal, heuristic_type)
-                        next_level.append((h, neighbor, path_so_far + [neighbor]))
-                        visited.add(neighbor)
-                        visited_order.append(neighbor)
-
-        # Ordenar el siguiente nivel y limitar el ancho del haz
-        next_level.sort(key=lambda x: x[0])
-        queue = next_level[:beam_width]
-
-    print("No se encontró un camino hacia el objetivo.")
-    return (None, visited_order)  # Retorna una tupla en caso de no encontrar el camino
+    print("No se encontró un camino al objetivo.")
+    return None

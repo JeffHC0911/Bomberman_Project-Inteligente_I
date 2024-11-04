@@ -25,11 +25,12 @@ class Bomberman(Agent):
         if not self.algoritmo_ejecutado:
             goal_pos = self.find_exit()
             if goal_pos:
-                self.path = self.select_algorithm(self.pos, goal_pos)
+                self.path = self.select_algorithm(self.pos, goal_pos) or []
                 if self.path is None:  # Comprobar si path es None
                     self.path = []  # Reiniciar a lista vacía
-                self.rocks = [pos for pos in self.path if any(isinstance(agent, Rock) 
-                            for agent in self.model.grid.get_cell_list_contents([pos]))]
+                self.rocks = [pos for pos in self.path if any(isinstance(agent, Rock)
+                    for agent in (self.model.grid.get_cell_list_contents([pos]) or []))]
+
                 if self.path:
                     print(f"Bomberman {self.unique_id} encontró camino: {self.path}")
                     print("Rocas encontradas: ", self.rocks)
