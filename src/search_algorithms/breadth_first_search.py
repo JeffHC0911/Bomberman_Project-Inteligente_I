@@ -1,5 +1,5 @@
 from collections import deque
-from utils import sort_neighbors  # Asegúrate de importar la función
+from utils import sort_neighbors  
 
 def breadth_first_search(model, start, goal, priority):
     print(f"Inicio de BFS: start={start}, goal={goal}")
