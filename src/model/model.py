@@ -8,11 +8,12 @@ from search_algorithms import breadth_first_search
 from .agents import Bomberman, Enemy, Rock, Metal, Path, Meta
 
 class BombermanModel(Model):
-    def __init__(self, width, height, num_bombers, num_enemies, algorithm, priority, map_file):
+    def __init__(self, width, height, num_bombers, num_enemies, algorithm, priority, heuristic, map_file):
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(width, height, torus=False)
         self.algorithm = algorithm
         self.priority = priorities[priority]  # Usar el diccionario de prioridades
+        self.heuristic = heuristic
         self.load_and_setup_map(map_file)
 
         for i in range(num_bombers):

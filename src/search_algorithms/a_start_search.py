@@ -1,17 +1,25 @@
 import heapq
-from utils import manhattan_distance, sort_neighbors
+from utils import manhattan_distance, euclidean_distance, sort_neighbors
 
-def a_star_search(model, start, goal, priority):
-    print(f"Inicio de A*: start={start}, goal={goal}")
+def a_star_search(model, start, goal, priority, heuristic):
+    print(f"Inicio de A*: start={start}, goal={goal}, heuristic={heuristic}")
+
+    # Selección de la función de heurística
+    if heuristic == 'Manhattan':
+        heuristic_func = manhattan_distance
+    elif heuristic == 'Euclidean':
+        heuristic_func = euclidean_distance
+    else:
+        raise ValueError("Heurística no reconocida")
 
     # Inicialización
     open_list = []
-    visited = set()  # Conjunto de nodos visitados
+    visited = set()
     g_score = {start: 0}
-    f_score = {start: manhattan_distance(goal, start)}
+    f_score = {start: heuristic_func(goal, start)}
     came_from = {start: None}
     step_counter = 0
-    exploration_order = -1  # Contador para el orden de exploración
+    exploration_order = -1
 
     # Iniciamos la cola con el nodo inicial
     heapq.heappush(open_list, (f_score[start], step_counter, start))
@@ -19,16 +27,13 @@ def a_star_search(model, start, goal, priority):
     while open_list:
         current_f, _, current = heapq.heappop(open_list)
 
-        # Si ya exploramos este nodo, continuamos
         if current in visited:
             continue
 
-        # Marcamos el nodo como visitado y lo etiquetamos
         exploration_order += 1
         model.label_cell(current, exploration_order)
         visited.add(current)
 
-        # Si llegamos al objetivo, reconstruimos el camino
         if current == goal:
             path = []
             while current is not None:
@@ -36,27 +41,20 @@ def a_star_search(model, start, goal, priority):
                 current = came_from[current]
             return path[::-1]
 
-        # Obtenemos y ordenamos los vecinos
         neighbors = model.grid.get_neighborhood(current, moore=False, include_center=False)
-        sort_neighbors(neighbors, current, priority)
+        sorted_neighbors = sort_neighbors(neighbors, current, priority)
 
-        # Evaluamos cada vecino
-        for neighbor in neighbors:
-            # Verificamos si el vecino es válido
+        for neighbor in sorted_neighbors:
             if not model.is_cell_empty(neighbor) or neighbor in visited:
                 continue
 
-            # Calculamos el nuevo g_score
             tentative_g_score = g_score[current] + 10
 
-            # Si encontramos un mejor camino
             if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
-                # Actualizamos los valores para este vecino
                 came_from[neighbor] = current
                 g_score[neighbor] = tentative_g_score
-                f_score[neighbor] = tentative_g_score + manhattan_distance(goal, neighbor)
+                f_score[neighbor] = tentative_g_score + heuristic_func(goal, neighbor)
                 
-                # Actualizamos el contador de pasos y añadimos a la cola
                 step_counter -= 1
                 heapq.heappush(open_list, (f_score[neighbor], step_counter, neighbor))
 

@@ -138,11 +138,11 @@ class Bomberman(Agent):
         elif self.model.algorithm == "UCS":
             return uniform_cost_search(self.model, start, goal, self.model.priority)
         elif self.model.algorithm == "A*":
-            return a_star_search(self.model, start, goal, self.model.priority)
+            return a_star_search(self.model, start, goal, self.model.priority, self.model.heuristic)
         elif self.model.algorithm == "HCS":
-            return hill_climbing_search(self.model, start, goal, self.model.priority)
+            return hill_climbing_search(self.model, start, goal, self.model.priority, self.model.heuristic)
         elif self.model.algorithm == "BS":
-            return beam_search(self.model, start, goal, self.model.priority)
+            return beam_search(self.model, start, goal, self.model.priority, self.model.heuristic)
         else:
             return []
 

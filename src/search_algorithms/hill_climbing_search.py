@@ -1,7 +1,15 @@
-from utils import manhattan_distance, sort_neighbors
+from utils import manhattan_distance, euclidean_distance, sort_neighbors
 
-def hill_climbing_search(model, start, goal, priority):
-    print(f"Inicio de Hill Climbing: start={start}, goal={goal}")
+def hill_climbing_search(model, start, goal, priority, heuristic):
+    print(f"Inicio de Hill Climbing: start={start}, goal={goal}, heuristic={heuristic}, priority={priority}")
+    
+    # Selección de la función de heurística
+    if heuristic == 'Manhattan':
+        heuristic_func = manhattan_distance
+    elif heuristic == 'Euclidean':
+        heuristic_func = euclidean_distance
+    else:
+        raise ValueError("Heurística no reconocida")
     
     # Estado inicial
     current = start
@@ -12,7 +20,7 @@ def hill_climbing_search(model, start, goal, priority):
     
     # Función para calcular el valor heurístico combinado
     def get_heuristic_value(pos):
-        return manhattan_distance(goal, pos) + path_cost[current]
+        return heuristic_func(goal, pos) + path_cost[current]
     
     # Etiquetar nodo inicial
     model.label_cell(current, exploration_order)
@@ -23,12 +31,13 @@ def hill_climbing_search(model, start, goal, priority):
     stuck_count = 0  # Contador para detectar cuando estamos atascados
     
     while current != goal:
-        # Obtener y ordenar vecinos
+        # Obtener y ordenar vecinos aplicando prioridad
         neighbors = model.grid.get_neighborhood(current, moore=False, include_center=False)
+        sorted_neighbors = sort_neighbors(neighbors, current , priority)
         valid_neighbors = []
         
         # Filtrar y evaluar vecinos
-        for neighbor in neighbors:
+        for neighbor in sorted_neighbors:
             if model.is_cell_empty(neighbor):
                 # Calcular el costo tentativo para llegar a este vecino
                 tentative_cost = path_cost[current] + 10  # Costo base por movimiento
@@ -38,7 +47,7 @@ def hill_climbing_search(model, start, goal, priority):
                     continue
                 
                 # Calcular score combinando distancia al objetivo y costo del camino
-                neighbor_score = manhattan_distance(goal, neighbor)
+                neighbor_score = heuristic_func(goal, neighbor)
                 valid_neighbors.append((neighbor, neighbor_score))
         
         if not valid_neighbors:

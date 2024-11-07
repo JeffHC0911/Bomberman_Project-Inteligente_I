@@ -1,11 +1,19 @@
 import heapq
-from utils import manhattan_distance, sort_neighbors
+from utils import manhattan_distance, euclidean_distance, sort_neighbors
 
-def beam_search(model, start, goal, priority, k=2):
-    print(f"Inicio de Beam Search: start={start}, goal={goal}, ancho del haz k={k}")
+def beam_search(model, start, goal, priority, heuristic, k=2):
+    print(f"Inicio de Beam Search: start={start}, goal={goal}, heuristic={heuristic} ,ancho del haz k={k}")
+
+    # Selección de la función de heurística
+    if heuristic == 'Manhattan':
+        heuristic_func = manhattan_distance
+    elif heuristic == 'Euclidean':
+        heuristic_func = euclidean_distance
+    else:
+        raise ValueError("Heurística no reconocida")
 
     # Inicialización
-    open_levels = {0: [(start, manhattan_distance(goal, start))]}
+    open_levels = {0: [(start, heuristic_func(goal, start))]}
     visited = set()  # Conjunto de nodos visitados
     came_from = {start: None}
     g_score = {start: 0}
@@ -60,8 +68,8 @@ def beam_search(model, start, goal, priority, k=2):
                     came_from[neighbor] = current
 
                     # Añadir a los candidatos del siguiente nivel con su puntaje
-                    heuristic = manhattan_distance(goal, neighbor)
-                    new_level.append((neighbor, heuristic + tentative_g_score))
+                    neighbor_heuristic = heuristic_func(goal, neighbor)
+                    new_level.append((neighbor, neighbor_heuristic + tentative_g_score))
 
             # Añadimos los nodos del nuevo nivel al diccionario `open_levels`
             next_level = level + 1
