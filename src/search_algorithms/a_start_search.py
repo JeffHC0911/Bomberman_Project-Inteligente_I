@@ -41,13 +41,15 @@ def a_star_search(model, start, goal, priority, heuristic):
                 current = came_from[current]
             return path[::-1]
 
+        # Obtenemos y ordenamos los vecinos (solo ortogonales, sin diagonales)
         neighbors = model.grid.get_neighborhood(current, moore=False, include_center=False)
-        sorted_neighbors = sort_neighbors(neighbors, current, priority)
+        sort_neighbors(neighbors, current, priority)
 
-        for neighbor in sorted_neighbors:
+        for neighbor in neighbors:
             if not model.is_cell_empty(neighbor) or neighbor in visited:
                 continue
 
+            # Costo de movimiento constante (10 unidades) para movimientos ortogonales
             tentative_g_score = g_score[current] + 10
 
             if neighbor not in g_score or tentative_g_score < g_score[neighbor]:

@@ -51,7 +51,7 @@ def sort_neighbors(neighbors, start, priority):
     return [neighbor for neighbor, direction in sorted_neighbors]
 
 def manhattan_distance(goal, neighbor):
-    return (abs(goal[0] - neighbor[0]) + abs(goal[1] - neighbor[1])) * 10
+    return (abs(goal[0] - neighbor[0]) + abs(goal[1] - neighbor[1]))
 
 def euclidean_distance(goal, neighbor):
-    return (((goal[0] - neighbor[0]) ** 2 + (goal[1] - neighbor[1]) ** 2) ** 0.5) * 10
+    return (((goal[0] - neighbor[0]) ** 2 + (goal[1] - neighbor[1]) ** 2) ** 0.5)
