@@ -70,9 +70,9 @@ server = ModularServer(
         "width": default_width,
         "height": default_height,
         "num_bombers": 0,
-        "num_enemies": 1,
-        "algorithm": Choice(name='Seleccionar algoritmo', value='HCS', choices=['BFS', 'DFS', 'UCS', 'HCS', 'A*', 'BS'], description='Seleccionar algoritmo de búsqueda'),
-        "priority": Choice(name='Seleccionar prioridad', value='Der Aba Arr Izq', choices=["Der Aba Arr Izq", "Der Arr Izq Aba", "Arr Der Izq Aba", "Izq Der Aba Arr", "Izq Arr Der Aba"], description='Seleccionar prioridad de movimiento'),
+        "num_enemies": 0,
+        "algorithm": Choice(name='Seleccionar algoritmo', value='A*', choices=['BFS', 'DFS', 'UCS', 'HCS', 'A*', 'BS'], description='Seleccionar algoritmo de búsqueda'),
+        "priority": Choice(name='Seleccionar prioridad', value='Izq Arr Der Aba', choices=["Der Aba Arr Izq", "Der Arr Izq Aba", "Arr Der Izq Aba", "Izq Der Aba Arr", "Izq Arr Der Aba"], description='Seleccionar prioridad de movimiento'),
         "heuristic": Choice(name='Seleccionar heuristica', value='Manhattan', choices=['Manhattan', 'Euclidean'], description='Seleccionar heurística '),
         "map_file": default_map_file_path
     }

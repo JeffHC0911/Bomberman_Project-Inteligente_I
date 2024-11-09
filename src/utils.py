@@ -31,16 +31,17 @@ priorities = {
 
 def get_priority_index(direction, priority):
     dir_map = {
-        (0, 1): "Arriba",  # Ajustado a los nombres en español
+        (0, 1): "Arriba",  
         (1, 0): "Derecha",
         (0, -1): "Abajo",
         (-1, 0): "Izquierda"
     }
 
     dir_name = dir_map.get(direction)
-    if dir_name and dir_name in priority:
+    if dir_name in priority:
         return priority.index(dir_name)
-    return len(priority)
+    return -1  # Devuelve -1 si no se encuentra en priority
+
 
 def sort_neighbors(neighbors, start, priority):
     neighbors_with_directions = [
@@ -51,7 +52,7 @@ def sort_neighbors(neighbors, start, priority):
     return [neighbor for neighbor, direction in sorted_neighbors]
 
 def manhattan_distance(goal, neighbor):
-    return (abs(goal[0] - neighbor[0]) + abs(goal[1] - neighbor[1]))
+    return (abs(goal[0] - neighbor[0]) + abs(goal[1] - neighbor[1])) * 10
 
 def euclidean_distance(goal, neighbor):
-    return (((goal[0] - neighbor[0]) ** 2 + (goal[1] - neighbor[1]) ** 2) ** 0.5)
+    return (((goal[0] - neighbor[0]) ** 2 + (goal[1] - neighbor[1]) ** 2) ** 0.5) * 10

@@ -35,7 +35,7 @@ class BombermanModel(Model):
                 if not any(isinstance(agent, (Metal, Bomberman)) for agent in contents):
                     self.grid.place_agent(enemy, (x, y))
                     break
-    
+
     def step(self):
         if not self.running:
             return  # Detener si el juego ya no está en ejecución
@@ -127,3 +127,4 @@ class BombermanModel(Model):
             if isinstance(agent, Path):  # Puedes ajustar esto si utilizas otro tipo para representar caminos
                 agent.label = label  # Asigna la etiqueta
 
+   
