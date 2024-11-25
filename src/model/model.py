@@ -32,7 +32,7 @@ class BombermanModel(Model):
                 contents = self.grid.get_cell_list_contents((x, y))
                 
                 # Solo coloca el enemigo si la celda no contiene Metal ni Bomberman
-                if not any(isinstance(agent, (Metal, Bomberman)) for agent in contents):
+                if not any(isinstance(agent, (Metal, Bomberman, Rock)) for agent in contents):
                     self.grid.place_agent(enemy, (x, y))
                     break
 
@@ -73,7 +73,7 @@ class BombermanModel(Model):
         contents = self.grid.get_cell_list_contents([pos])
         
         # Retorna True si la celda está vacía o solo tiene caminos o la meta
-        return all(isinstance(agent, (Path, Meta, Rock)) for agent in contents)
+        return all(isinstance(agent, (Path, Meta, Rock, Enemy)) for agent in contents)
 
     def load_and_setup_map(self, map_file):
         with open(map_file, 'r') as file:
