@@ -5,7 +5,12 @@ from mesa.space import MultiGrid
 from utils import priorities
 
 from search_algorithms import breadth_first_search
-from .agents import Bomberman, Enemy, Rock, Metal, Path, Meta
+from model.agents.bomberman import Bomberman
+from model.agents.enemy import Enemy
+from model.agents.rock import Rock
+from model.agents.metal import Metal
+from model.agents.path import Path
+from model.agents.meta import Meta
 
 class BombermanModel(Model):
     def __init__(self, width, height, num_bombers, num_enemies, algorithm, priority, heuristic, map_file):

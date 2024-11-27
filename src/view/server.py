@@ -5,7 +5,14 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization import Choice
 from model.model import BombermanModel
-from model.agents import Bomberman, Enemy, Rock, Metal, Path, Meta, Bomb, Explosion
+from model.agents.bomberman import Bomberman
+from model.agents.enemy import Enemy
+from model.agents.rock import Rock
+from model.agents.metal import Metal
+from model.agents.path import Path
+from model.agents.meta import Meta
+from model.agents.bomb import Bomb
+from model.agents.explosion import Explosion
 
 # Función para cargar el archivo del mapa utilizando tkinter
 def get_map_file_path():

@@ -7,6 +7,11 @@ from search_algorithms.a_start_search import a_star_search
 from search_algorithms.beam_search import beam_search
 from search_algorithms.hill_climbing_search import hill_climbing_search
 
+from model.agents.bomb import Bomb
+from model.agents.explosion import Explosion
+from model.agents.meta import Meta
+from model.agents.rock import Rock
+
 from utils import sort_neighbors
 
 class Bomberman(Agent):
@@ -145,140 +150,3 @@ class Bomberman(Agent):
             return beam_search(self.model, start, goal, self.model.priority, self.model.heuristic)
         else:
             return []
-
-
-
-class Enemy(Agent):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
-    
-    def step(self):
-        # Obtener posiciones posibles para moverse
-        possible_moves = self.model.grid.get_neighborhood(
-            self.pos,
-            moore=False,  
-            include_center=False
-        )
-
-        # Filtrar las posiciones que no tienen un agente de tipo Metal
-        valid_moves = [
-            pos for pos in possible_moves 
-            if not any(isinstance(agent, (Metal, Rock)) for agent in self.model.grid.get_cell_list_contents([pos]))
-        ]
-        
-         # Elegir una posición aleatoria de las válidas
-        if valid_moves:
-            new_position = random.choice(valid_moves)
-            self.model.grid.move_agent(self, new_position)
-
-class Rock(Agent):
-    def __init__(self, unique_id, model, is_exit=False):
-        super().__init__(unique_id, model)
-        self.is_exit = is_exit
-
-    def step(self):
-        pass
-
-class Metal(Agent):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
-
-    def step(self):
-        # Puedes dejar esto vacío o agregar comportamiento en el futuro
-        pass
-
-class Meta(Agent):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
-
-    def step(self):
-        # Puedes dejar esto vacío o agregar comportamiento en el futuro
-        pass
-
-class Path(Agent):
-    def __init__(self, unique_id, model):
-        super().__init__(unique_id, model)
-        self.label = None  # Inicializa la etiqueta como None
-        self.visited = 0  # Inicializa el contador de visitas
-
-    def step(self):
-        pass
-
-class Explosion(Agent):
-    def __init__(self, unique_id, model, pos):
-        super().__init__(unique_id, model)
-        self.pos = pos
-        self.cooldown = 1
-
-    def step(self):
-        self.cooldown -= 1
-        if self.cooldown <= 0:
-            print(f"Explosión {self.unique_id} en la posición {self.pos}")
-            
-            # Obtener todos los agentes en la misma posición
-            cell_contents = self.model.grid.get_cell_list_contents([self.pos])
-            
-            # Crear una lista de agentes a eliminar
-            agents_to_remove = []
-            for agent in cell_contents:
-                if isinstance(agent, Rock):
-                    agents_to_remove.append(agent)
-            
-            # Eliminar los agentes de manera segura
-            for agent in agents_to_remove:
-                try:
-                    print(f"Eliminando Rock {agent.unique_id} en {self.pos}")
-                    self.model.grid.remove_agent(agent)
-                    self.model.schedule.remove(agent)
-                except Exception as e:
-                    print(f"Error al eliminar Rock: {e}")
-            
-            # Eliminar la explosión
-            try:
-                self.model.grid.remove_agent(self)
-                self.model.schedule.remove(self)
-            except Exception as e:
-                print(f"Error al eliminar Explosión: {e}")
-
-
-class Bomb(Agent):
-    def __init__(self, unique_id, model, pd, pos):
-        super().__init__(unique_id, model)
-        self.pos = pos
-        self.pd = pd
-        self.cooldown = pd + 1
-
-    def step(self):
-        self.cooldown -= 1
-        if self.cooldown <= 0:
-            print(f"Bomba {self.unique_id} explotando en {self.pos}")
-            
-            # Definir área de explosión
-            area = self.model.grid.get_neighborhood(
-                self.pos, 
-                moore=False,  # Solo cruz, no diagonales
-                include_center=True,
-                radius=1
-            )
-            
-            # Verificar cada posición del área de explosión
-            for pos in area:
-                if (0 <= pos[0] < self.model.grid.width and 
-                    0 <= pos[1] < self.model.grid.height):
-                    try:
-                        explosion_id = self.model.schedule.get_agent_count() + 1
-                        explosion = Explosion(explosion_id, self.model, pos)
-                        self.model.grid.place_agent(explosion, pos)
-                        self.model.schedule.add(explosion)
-                        print(f"Explosión creada en {pos} con ID {explosion_id}")
-                    except Exception as e:
-                        print(f"Error al crear explosión en {pos}: {e}")
-            
-            # Eliminar la bomba de manera segura
-            try:
-                self.model.grid.remove_agent(self)
-                self.model.schedule.remove(self)
-                print(f"Bomba {self.unique_id} eliminada correctamente")
-            except Exception as e:
-                print(f"Error al eliminar Bomba: {e}")
-
