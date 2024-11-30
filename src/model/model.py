@@ -11,14 +11,16 @@ from model.agents.rock import Rock
 from model.agents.metal import Metal
 from model.agents.path import Path
 from model.agents.meta import Meta
+from model.agents.wildcard import Wildcard
 
 class BombermanModel(Model):
-    def __init__(self, width, height, num_bombers, num_enemies, algorithm, priority, heuristic, map_file):
+    def __init__(self, width, height, num_bombers, num_enemies, num_wildcards, algorithm, priority, heuristic, map_file):
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(width, height, torus=False)
         self.algorithm = algorithm
         self.priority = priorities[priority]  # Usar el diccionario de prioridades
         self.heuristic = heuristic
+        self.num_wildcards = num_wildcards
         self.load_and_setup_map(map_file)
 
         for i in range(num_bombers):
@@ -40,6 +42,32 @@ class BombermanModel(Model):
                 if not any(isinstance(agent, (Metal, Bomberman, Rock)) for agent in contents):
                     self.grid.place_agent(enemy, (x, y))
                     break
+
+        # Asignar *wildcards* a rocas
+        self.assign_wildcards_to_rocks()
+
+    
+    def assign_wildcards_to_rocks(self):
+        """
+        Asocia un número limitado de *wildcards* a rocas seleccionadas al azar.
+        """
+        # Obtener todas las rocas en el mapa
+        rock_agents = [agent for agent in self.schedule.agents if isinstance(agent, Rock)]
+        if not rock_agents:
+            print("No hay rocas disponibles para asignar *wildcards*.")
+            return
+
+        # Seleccionar rocas aleatorias para asignar *wildcards*
+        selected_rocks = random.sample(rock_agents, min(self.num_wildcards, len(rock_agents)))
+
+        for rock in selected_rocks:
+            wildcard_id = self.schedule.get_agent_count() + 1
+            wildcard = Wildcard(wildcard_id, self, rock.pos)
+            self.schedule.add(wildcard)
+            self.grid.place_agent(wildcard, rock.pos)
+            rock.comodin_asociado = wildcard  # Vincular el *wildcard* a la roca
+            print(f"Wildcard asignado a la roca en {rock.pos}.")
+        
 
     def step(self):
         if not self.running:
@@ -78,7 +106,7 @@ class BombermanModel(Model):
         contents = self.grid.get_cell_list_contents([pos])
         
         # Retorna True si la celda está vacía o solo tiene caminos o la meta
-        return all(isinstance(agent, (Path, Meta, Rock, Enemy)) for agent in contents)
+        return all(isinstance(agent, (Path, Meta, Rock, Enemy, Wildcard)) for agent in contents)
 
     def load_and_setup_map(self, map_file):
         with open(map_file, 'r') as file:

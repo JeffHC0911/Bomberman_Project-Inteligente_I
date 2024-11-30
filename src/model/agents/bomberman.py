@@ -11,6 +11,7 @@ from model.agents.bomb import Bomb
 from model.agents.explosion import Explosion
 from model.agents.meta import Meta
 from model.agents.rock import Rock
+from model.agents.wildcard import Wildcard
 
 from utils import sort_neighbors
 
@@ -18,6 +19,7 @@ class Bomberman(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.path = []  
+        self.pd = 1  # Poder de destrucción inicial
         self.algoritmo_ejecutado = False
         self.waiting_for_explosion = False
         self.history = []  
@@ -27,6 +29,9 @@ class Bomberman(Agent):
 
     def step(self):
         # Ejecuta el algoritmo de búsqueda solo una vez
+
+        self.check_wildcard()
+
         if not self.algoritmo_ejecutado:
             goal_pos = self.find_exit()
             if goal_pos:
@@ -83,6 +88,17 @@ class Bomberman(Agent):
             if next_position == self.find_exit():
                 self.model.schedule.remove(self)
                 self.model.running = False
+    
+    def check_wildcard(self):
+        # Verificar si hay un comodín en la posición actual y lo recoge
+
+        cell_contents = self.model.grid.get_cell_list_contents([self.pos])
+        for agent in cell_contents:
+            if isinstance(agent, Wildcard):
+                self.pd += 1
+                self.model.grid.remove_agent(agent)
+                self.model.schedule.remove(agent)
+                print(f"Bomberman {self.unique_id} recogió un comodín en {self.pos}. Poder aumentado a {self.pd}.")
 
 
     def move(self, next_step):
@@ -94,7 +110,7 @@ class Bomberman(Agent):
         self.rocks.remove(next_position)
         
         # Coloca la bomba en la posición actual
-        bomb_agent = Bomb(self.model.schedule.get_agent_count(), self.model, 1, self.pos)
+        bomb_agent = Bomb(self.model.schedule.get_agent_count(), self.model, self.pd, self.pos)
         self.model.schedule.add(bomb_agent)
         self.model.grid.place_agent(bomb_agent, self.pos)
         self.waiting_for_explosion = True

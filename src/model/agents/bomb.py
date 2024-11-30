@@ -1,5 +1,4 @@
 from mesa import Agent
-
 from model.agents.explosion import Explosion
 
 
@@ -15,16 +14,20 @@ class Bomb(Agent):
         if self.cooldown <= 0:
             print(f"Bomba {self.unique_id} explotando en {self.pos}")
             
-            # Definir área de explosión
-            area = self.model.grid.get_neighborhood(
-                self.pos, 
-                moore=False,  # Solo cruz, no diagonales
-                include_center=True,
-                radius=1
-            )
-            
-            # Verificar cada posición del área de explosión
-            for pos in area:
+            # Definir las direcciones ortogonales
+            directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Arriba, abajo, izquierda, derecha
+            explosion_area = [self.pos]  # Incluir la posición de la bomba
+
+            # Expandir en cada dirección hasta el alcance `pd`
+            for dx, dy in directions:
+                for step in range(1, self.pd + 1):
+                    new_pos = (self.pos[0] + dx * step, self.pos[1] + dy * step)
+                    if (0 <= new_pos[0] < self.model.grid.width and 
+                        0 <= new_pos[1] < self.model.grid.height):
+                        explosion_area.append(new_pos)
+
+            # Crear explosiones en el área calculada
+            for pos in explosion_area:
                 if (0 <= pos[0] < self.model.grid.width and 
                     0 <= pos[1] < self.model.grid.height):
                     try:

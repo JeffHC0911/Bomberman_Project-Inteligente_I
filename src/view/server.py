@@ -13,6 +13,8 @@ from model.agents.path import Path
 from model.agents.meta import Meta
 from model.agents.bomb import Bomb
 from model.agents.explosion import Explosion
+from model.agents.wildcard import Wildcard
+
 
 # Función para cargar el archivo del mapa utilizando tkinter
 def get_map_file_path():
@@ -60,6 +62,8 @@ def agent_portrayal(agent):
         portrayal = {"Shape": "resources/assets/bomba.png", "Layer": 1, "scale": 1}
     elif isinstance(agent, Explosion):
         portrayal = {"Shape": "resources/assets/explosion.png", "Layer": 1, "scale": 1}
+    elif isinstance(agent, Wildcard):
+        portrayal = {"Shape": "resources/assets/comodin.png", "Layer": 1, "scale": 1}
     return portrayal
 
 # Cargar el mapa por defecto y obtener sus dimensiones
@@ -77,7 +81,8 @@ server = ModularServer(
         "width": default_width,
         "height": default_height,
         "num_bombers": 0,
-        "num_enemies": 1,
+        "num_enemies": 0,
+        "num_wildcards": 1,
         "algorithm": Choice(name='Seleccionar algoritmo', value='A*', choices=['BFS', 'DFS', 'UCS', 'HCS', 'A*', 'BS'], description='Seleccionar algoritmo de búsqueda'),
         "priority": Choice(name='Seleccionar prioridad', value='Izq Arr Der Aba', choices=["Der Aba Arr Izq", "Der Arr Izq Aba", "Arr Der Izq Aba", "Izq Der Aba Arr", "Izq Arr Der Aba"], description='Seleccionar prioridad de movimiento'),
         "heuristic": Choice(name='Seleccionar heuristica', value='Manhattan', choices=['Manhattan', 'Euclidean'], description='Seleccionar heurística '),
