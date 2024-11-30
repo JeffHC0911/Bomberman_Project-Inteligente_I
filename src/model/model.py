@@ -63,11 +63,10 @@ class BombermanModel(Model):
         for rock in selected_rocks:
             wildcard_id = self.schedule.get_agent_count() + 1
             wildcard = Wildcard(wildcard_id, self, rock.pos)
-            self.schedule.add(wildcard)
-            self.grid.place_agent(wildcard, rock.pos)
+            self.schedule.add(wildcard)  # Solo lo agregamos al schedule, pero no al grid
             rock.comodin_asociado = wildcard  # Vincular el *wildcard* a la roca
-            print(f"Wildcard asignado a la roca en {rock.pos}.")
-        
+            print(f"Wildcard vinculado a la roca en {rock.pos}.")
+
 
     def step(self):
         if not self.running:

@@ -29,6 +29,12 @@ class Explosion(Agent):
                     print(f"Eliminando Rock {agent.unique_id} en {self.pos}")
                     self.model.grid.remove_agent(agent)
                     self.model.schedule.remove(agent)
+
+                    # Revelar el comodín asociado si existe
+                    if agent.comodin_asociado:
+                        self.model.grid.place_agent(agent.comodin_asociado, self.pos)
+                        print(f"Comodín revelado en {self.pos}.")
+                        
                 except Exception as e:
                     print(f"Error al eliminar Rock: {e}")
             
