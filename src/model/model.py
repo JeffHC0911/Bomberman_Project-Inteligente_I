@@ -1,7 +1,8 @@
 from mesa import Model
 import random 
-from mesa.time import RandomActivation
+from mesa.time import RandomActivation, SimultaneousActivation
 from mesa.space import MultiGrid
+import numpy as np
 from utils import priorities
 
 from search_algorithms import breadth_first_search
@@ -12,21 +13,28 @@ from model.agents.metal import Metal
 from model.agents.path import Path
 from model.agents.meta import Meta
 from model.agents.wildcard import Wildcard
+from search_algorithms.minmax import minimax_with_alpha_beta_and_astar
+
 
 class BombermanModel(Model):
-    def __init__(self, width, height, num_bombers, num_enemies, num_wildcards, algorithm, priority, heuristic, map_file):
+    def __init__(self, width, height, num_bombers, num_enemies, num_wildcards, algorithm, priority, heuristic, map_file, difficulty):
         self.schedule = RandomActivation(self)
         self.grid = MultiGrid(width, height, torus=False)
         self.algorithm = algorithm
         self.priority = priorities[priority]  # Usar el diccionario de prioridades
         self.heuristic = heuristic
         self.num_wildcards = num_wildcards
+        #self.running = True
+        self.difficulty = difficulty
+
         self.load_and_setup_map(map_file)
+        self.bomber = []
 
         for i in range(num_bombers):
             bomber = Bomberman(i, self)
             self.schedule.add(bomber)
             self.grid.place_agent(bomber, (1, 1))  # Posición inicial, ajustar según el mapa
+            self.bomber.append(bomber)
 
         for i in range(num_enemies):
             enemy = Enemy(i + num_bombers, self)
@@ -69,22 +77,23 @@ class BombermanModel(Model):
 
 
     def step(self):
-        if not self.running:
-            return  # Detener si el juego ya no está en ejecución
-        
-        # Ejecutar los pasos de los agentes
-        self.schedule.step()
-        
-        # Verificar si Bomberman y algún enemigo están en la misma posición
-        for cell in self.grid.coord_iter():
-            cell_contents = cell[0]
-            bomber_present = any(isinstance(agent, Bomberman) for agent in cell_contents)
-            enemy_present = any(isinstance(agent, Enemy) for agent in cell_contents)
+            if not self.running:
+                return  # Detener si el juego ya no está en ejecución
             
-            if bomber_present and enemy_present:
-                print("Bomberman y Enemy se encontraron. El juego se detiene.")
-                self.running = False  # Detener el juego
-                break
+            # Ejecutar los pasos de los agentes
+            self.schedule.step()
+            
+            # Verificar si Bomberman y algún enemigo están en la misma posición
+            for cell in self.grid.coord_iter():
+                cell_contents = cell[0]
+                bomber_present = any(isinstance(agent, Bomberman) for agent in cell_contents)
+                enemy_present = any(isinstance(agent, Enemy) for agent in cell_contents)
+                
+                if bomber_present and enemy_present:
+                    print("Bomberman y Enemy se encontraron. El juego se detiene.")
+                    self.running = False  # Detener el juego
+                    break
+
 
     def find_empty_cell(self):
         """
@@ -137,11 +146,13 @@ class BombermanModel(Model):
                     bomber = Bomberman((x, y), self)
                     self.schedule.add(bomber)
                     self.grid.place_agent(bomber, (x, y))
+                    #self.bomber.append(bomber)
                 elif cell == 'C_m':  # Colocar el agente Meta
                     meta = Meta((x, y), self)
                     self.schedule.add(meta)  # Asegúrate de agregarla al schedule
                     self.grid.place_agent(meta, (x, y))
                     print(f"Meta colocada en {(x, y)}")
+                    self.goal = (x, y)
 
                     meta_pos = meta.pos  # Obtener la posición del agente Meta
                     cell_contents = self.grid.get_cell_list_contents([meta_pos])  # Contenido de la celda
@@ -158,5 +169,15 @@ class BombermanModel(Model):
         for agent in cell_contents:
             if isinstance(agent, Path):  # Puedes ajustar esto si utilizas otro tipo para representar caminos
                 agent.label = label  # Asigna la etiqueta
+
+    def get_enemy_positions(self):
+        """Obtiene una lista de las posiciones de todos los enemigos."""
+        enemies = []
+        enemy_positions = []
+        for agent in self.schedule.agents:
+            if isinstance(agent, Enemy):
+                enemy_positions.append(agent.pos)
+                enemies.append(agent)
+        return enemy_positions, enemies
 
    

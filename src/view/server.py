@@ -82,11 +82,12 @@ server = ModularServer(
         "width": default_width,
         "height": default_height,
         "num_bombers": 0,
-        "num_enemies": 0,
+        "num_enemies": 1,
         "num_wildcards": NumberInput(name="Número de Wildcards", value=0, description="Cantidad de comodines a colocar en el juego"),
-        "algorithm": Choice(name='Seleccionar algoritmo', value='A*', choices=['BFS', 'DFS', 'UCS', 'HCS', 'A*', 'BS'], description='Seleccionar algoritmo de búsqueda'),
+        "algorithm": Choice(name='Seleccionar algoritmo', value='A*', choices=['BFS', 'DFS', 'UCS', 'HCS', 'A*', 'BS', 'MiniMax'], description='Seleccionar algoritmo de búsqueda'),
         "priority": Choice(name='Seleccionar prioridad', value='Izq Arr Der Aba', choices=["Der Aba Arr Izq", "Der Arr Izq Aba", "Arr Der Izq Aba", "Izq Der Aba Arr", "Izq Arr Der Aba"], description='Seleccionar prioridad de movimiento'),
         "heuristic": Choice(name='Seleccionar heuristica', value='Manhattan', choices=['Manhattan', 'Euclidean'], description='Seleccionar heurística '),
+        "difficulty": Choice(name='Seleccionar dificultad', value=0, choices=[0, 1, 2], description='Seleccionar nivel de dificultad'),
         "map_file": default_map_file_path
     }
 )
