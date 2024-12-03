@@ -56,3 +56,16 @@ def manhattan_distance(goal, neighbor):
 
 def euclidean_distance(goal, neighbor):
     return (((goal[0] - neighbor[0]) ** 2 + (goal[1] - neighbor[1]) ** 2) ** 0.5) * 10
+
+# Función de heurística de Manhattan
+def manhattan_distance_minimax(state):
+    goal = state['goal_position']
+    current_pos = state['bomberman_position']
+    return (abs(goal[0] - current_pos[0]) + abs(goal[1] - current_pos[1])) * 10
+
+# Función de heurística Euclidiana
+def euclidean_distance_minimax(state):
+    goal = state['goal_position']
+    current_pos = state['bomberman_position']
+    return ((goal[0] - current_pos[0]) ** 2 + (goal[1] - current_pos[1]) ** 2) ** 0.5
+

@@ -26,9 +26,10 @@ class BombermanModel(Model):
         self.num_wildcards = num_wildcards
         #self.running = True
         self.difficulty = difficulty
+        self.bomber = []
+
 
         self.load_and_setup_map(map_file)
-        self.bomber = []
 
         for i in range(num_bombers):
             bomber = Bomberman(i, self)
@@ -77,22 +78,91 @@ class BombermanModel(Model):
 
 
     def step(self):
-            if not self.running:
-                return  # Detener si el juego ya no está en ejecución
-            
-            # Ejecutar los pasos de los agentes
-            self.schedule.step()
-            
+        if not self.running:
+            return  # Detener si el juego ya no está en ejecución
+
+        # Verificar que Bomberman está creado antes de proceder
+        if not self.bomber:
+            print("Error: Bomberman no ha sido creado o agregado correctamente.")
+            return  # Detener la ejecución si Bomberman no está en la lista
+
+        # Ejecutar los pasos de los agentes (mover a Bomberman y los enemigos)
+        self.schedule.step()
+
+        # Obtener las posiciones actuales de los enemigos
+        enemy_positions, enemies = self.get_enemy_positions()
+
+        # Obtener la posición de Bomberman y la meta
+        bomberman_pos = self.bomber[0].pos  # Suponiendo que sólo hay un Bomberman
+        goal_pos = self.goal  # La meta está definida en el modelo
+
+        # Determinar el max_depth en función de la dificultad
+        if self.difficulty == 1:
+            max_depth = 3  # Baja dificultad
+        elif self.difficulty == 2:
+            max_depth = 6  # Dificultad media
+        else:
+            max_depth = 0  # Dificultad 0, no usar Minimax, movimiento aleatorio
+
+        # Ejecutar Minimax con poda alfa-beta solo si la dificultad es 1 o 2
+        if self.algorithm == "MinMax" and self.difficulty > 0:
+            # Estado de Bomberman y los enemigos
+            state = {
+                'bomberman_position': bomberman_pos,
+                'enemy_position': [enemy.pos for enemy in enemies],
+            }
+
+            # Llamar a Minimax para el enemigo (jugadores minimizadores) solo si la dificultad es 1 o 2
+            eval_enemy, steps_enemy = minimax_with_alpha_beta_and_astar(
+                state, 0, -np.inf, np.inf, False, max_depth,  # Usar max_depth dinámico
+                self.heuristic, self, goal_pos
+            )
+
+            # Depurar los pasos calculados para los enemigos
+            if steps_enemy is not None:
+                print(f"Enemy steps calculated: {steps_enemy}")  # Depuración
+                # Mover a los enemigos basados en los pasos calculados
+                for i, enemy in enumerate(enemies):
+                    if i < len(steps_enemy):
+                        self.grid.move_agent(enemy, steps_enemy[i])
+                        print(f"Enemy {enemy.unique_id} moved to {steps_enemy[i]}")  # Depuración
+            else:
+                print("Error: No se calculó el camino para los enemigos.")
+                return  # Detener ejecución si no se obtienen pasos para los enemigos
+
+            # Llamar a Minimax para Bomberman (jugador maximizador)
+            eval_bomberman, bomberman_step = minimax_with_alpha_beta_and_astar(
+                state, 0, -np.inf, np.inf, True, max_depth,  # Usar max_depth dinámico
+                self.heuristic, self, goal_pos
+            )
+
+            # Depurar los pasos de Bomberman
+            if bomberman_step:
+                print(f"Bomberman steps calculated: {bomberman_step}")  # Depuración
+                self.grid.move_agent(self.bomber[0], bomberman_step)
+                print(f"Bomberman moved to {bomberman_step}")  # Depuración
+            else:
+                print("Error: No se calculó el camino para Bomberman.")
+                return  # Detener ejecución si no se obtienen pasos para Bomberman
+
+        # Movimiento aleatorio para los enemigos si la dificultad es 0
+        elif self.difficulty == 0:
+
             # Verificar si Bomberman y algún enemigo están en la misma posición
             for cell in self.grid.coord_iter():
                 cell_contents = cell[0]
                 bomber_present = any(isinstance(agent, Bomberman) for agent in cell_contents)
                 enemy_present = any(isinstance(agent, Enemy) for agent in cell_contents)
-                
+
                 if bomber_present and enemy_present:
                     print("Bomberman y Enemy se encontraron. El juego se detiene.")
                     self.running = False  # Detener el juego
                     break
+
+            # Verificar si Bomberman ha llegado a la meta
+            if self.bomber[0].pos == self.goal:
+                print("Bomberman ha llegado a la meta. El juego se detiene.")
+                self.running = False
 
 
     def find_empty_cell(self):
@@ -146,7 +216,7 @@ class BombermanModel(Model):
                     bomber = Bomberman((x, y), self)
                     self.schedule.add(bomber)
                     self.grid.place_agent(bomber, (x, y))
-                    #self.bomber.append(bomber)
+                    self.bomber.append(bomber)
                 elif cell == 'C_m':  # Colocar el agente Meta
                     meta = Meta((x, y), self)
                     self.schedule.add(meta)  # Asegúrate de agregarla al schedule
