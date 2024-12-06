@@ -1,0 +1,17 @@
+M,M,M,M,M,M,M,M,M,M,M,M,M,M,M,M,M,M,M,M
+M,C_g,C,C,C,C,C,M,C,C,C,C,C,M,C,C,M,C,C,M
+M,C,C,M,C,M,C,C,M,C,C,M,C,C,C,C,M,C,C,M
+M,C,C,M,C,M,C,C,C,C,M,C,C,C,M,C,M,C,C,M
+M,C,C,C,C,C,C,C,M,C,M,M,C,C,C,C,M,C,C,M
+M,C,M,M,C,M,C,E,M,C,C,C,C,M,C,C,C,C,C,M
+M,C,C,C,M,C,M,C,M,C,C,M,C,C,C,M,M,C,C,M
+M,C,M,C,M,C,C,B,C,C,M,M,C,C,C,C,C,C,C,M
+M,C,C,C,C,C,C,M,C,C,C,C,C,M,C,C,C,M,C,M
+M,C,M,C,C,M,C,C,M,M,M,M,C,C,C,M,C,C,C,M
+M,C,C,C,M,C,C,C,M,C,C,C,C,M,C,C,M,C,C,M
+M,C,M,C,C,M,C,M,M,C,C,M,C,C,C,C,C,C,C,M
+M,C,C,C,M,M,C,C,C,M,M,C,C,C,C,C,M,C,C,M
+M,M,C,C,C,C,M,C,C,C,C,C,C,C,M,C,C,C,C,M
+M,C,C,C,M,C,C,C,C,M,C,M,C,C,M,C,C,C,C,M
+M,C,M,E,M,C,M,C,E,C,C,C,C,C,C,M,C,C,C,M
+M,M,M,M,M,M,M,M,M,M,M,M,M,M,M,M,M,M,M,M
