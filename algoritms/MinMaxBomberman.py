@@ -1,31 +1,29 @@
 import numpy as np
 from algoritms.PathFinder import PathFinder
-from algoritms.AllPaths import AllPaths
-from algoritms.Astar import AStar
 from itertools import product
 
 class MinMaxBomberman(PathFinder):
-    def find_path(self, marcadorTurno, alpha, beta, nivel, bomberman_step, max_level, enemies_positions, is_bomberman, is_chasing):
+    def find_path(self, marcador_turno, alpha, beta, nivel, bomberman_step, max_level, enemies_positions, is_bomberman, is_chasing):
         
         if bomberman_step == self.goal:
-            return 10000, bomberman_step
+            return 100, bomberman_step
         
         if bomberman_step in enemies_positions:
-            return -10000, bomberman_step
+            return -100, bomberman_step
 
         if nivel == max_level:
             return self.calculate_heuristic(bomberman_step, enemies_positions, is_chasing), bomberman_step
 
         best_move = None
 
-        if marcadorTurno % 2 == 0:
+        if marcador_turno % 2 == 0:
             evalmax = -np.inf
 
             possible_steps = self.grid.get_neighborhood(bomberman_step, moore=False, include_center=False)
 
             for move in possible_steps:
                 if self.is_valid_grass_cell(move):
-                    val, _ = self.find_path(marcadorTurno + 1, alpha, beta, nivel + 1, move, max_level, enemies_positions, is_bomberman, is_chasing)
+                    val, _ = self.find_path(marcador_turno + 1, alpha, beta, nivel + 1, move, max_level, enemies_positions, is_bomberman, is_chasing)
 
                     if val > evalmax:
                         evalmax = val
@@ -45,7 +43,7 @@ class MinMaxBomberman(PathFinder):
             
             for move in posibles_combinaciones:
                 move = list(move)
-                val, _ = self.find_path(marcadorTurno + 1, alpha, beta, nivel + 1, bomberman_step, max_level, move, is_bomberman, is_chasing)
+                val, _ = self.find_path(marcador_turno + 1, alpha, beta, nivel + 1, bomberman_step, max_level, move, is_bomberman, is_chasing)
 
                 if val < evalmin:
                     evalmin = val
@@ -59,45 +57,55 @@ class MinMaxBomberman(PathFinder):
 
     def calculate_heuristic(self, bomberman_step, enemies_positions, is_chasing):
         """
-        Calcula la heurística combinada para que los enemigos se posicionen estratégicamente
-        cerca de la meta y persigan a Bomberman si se acerca.
+        Calcula una heurística basada en la zona de peligro (proximidad entre Bomberman y enemigos)
+        y la proximidad de los enemigos a la meta.
         """
-        distances_to_goal = [
-            self.manhattan_distance(enemy, self.goal) for enemy in enemies_positions
-        ]
-
         bomberman_to_goal = self.manhattan_distance(bomberman_step, self.goal)
-
         distances_to_bomberman = [
             self.manhattan_distance(enemy, bomberman_step) for enemy in enemies_positions
         ]
 
-        # Determinamos si Bomberman está cerca de la meta
-        bomberman_close_to_goal_threshold = 80
-        bomberman_close_to_goal = bomberman_to_goal <= bomberman_close_to_goal_threshold
+        distances_to_goal = [
+            self.manhattan_distance(enemy, self.goal) for enemy in enemies_positions
+        ]
+        
+        # Zonas de peligro y cercanía a la meta
+        danger_zone_threshold = 5  # Umbral de "peligro" cercano
+        goal_influence_threshold = 10  # Umbral para la influencia de la meta
 
-        # Determinamos si algún enemigo está lo suficientemente cerca de Bomberman
-        enemy_close_to_bomberman_threshold = 10
-        enemies_close_to_bomberman = any(
-            dist <= enemy_close_to_bomberman_threshold for dist in distances_to_bomberman
-        )
-
-        if bomberman_close_to_goal and enemies_close_to_bomberman:
-            # Si Bomberman está cerca de la meta y un enemigo está cerca de él, lo persiguen.
-            is_chasing = True
-
-        goal_weight = 4.0
-        bomberman_weight = 5.0 if bomberman_close_to_goal else 2.0
-
-        heuristic_scores = [
-            -goal_weight * dist_to_goal + bomberman_weight * dist_to_bomberman
-            for dist_to_goal, dist_to_bomberman in zip(distances_to_goal, distances_to_bomberman)
+        # Determinamos si algún enemigo está cerca de la zona de peligro
+        enemies_in_danger_zone = [
+            dist <= danger_zone_threshold for dist in distances_to_bomberman
         ]
 
+        # Influencia de la meta sobre los enemigos
+        enemies_close_to_goal = [
+            dist <= goal_influence_threshold for dist in distances_to_goal
+        ]
+
+        # Calculamos la heurística para el Bomberman
+        bomberman_score = 0
+        if bomberman_to_goal < goal_influence_threshold:
+            bomberman_score += 50  # Bonificación por estar cerca de la meta
+
+        # Penalizamos a los enemigos si están en la zona de peligro de Bomberman
+        danger_penalty = sum([1 for in_danger in enemies_in_danger_zone if in_danger]) * -10
+        
+        # Bonificación por enemigos cerca de la meta
+        goal_benefit = sum([1 for close_to_goal in enemies_close_to_goal if close_to_goal]) * 5
+
+        # Heurística final para los enemigos
+        heuristic_scores = [
+            -self.manhattan_distance(enemy, self.goal) + danger_penalty + goal_benefit
+            for enemy in enemies_positions
+        ]
+
+        # Si los enemigos están persiguiendo a Bomberman, priorizamos las distancias
         if is_chasing:
-            return sum(distances_to_bomberman)  # Minimizar distancia hacia Bomberman
+            return sum(distances_to_bomberman)  # Minimizar la distancia hacia Bomberman
         else:
-            return min(heuristic_scores)
+            return min(heuristic_scores)  # Elegir el mejor puntaje para los enemigos
+
 
     def calculate_possible_combinations(self, enemy_steps, bomberman_step=None, is_chasing=False):
         """

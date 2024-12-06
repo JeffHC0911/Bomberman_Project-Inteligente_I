@@ -16,8 +16,8 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization import Choice
 from utils.load import load
 
-CANVAS_WIDTH = 1100
-CANVAS_HEIGHT = 850
+CANVAS_WIDTH = 600
+CANVAS_HEIGHT = 600
 MAP_DIR = "maps/"
 DEFAULT_ALGORITHM = "BFS"
 DEFAULT_PRIORITY = "← ↑ → ↓"
