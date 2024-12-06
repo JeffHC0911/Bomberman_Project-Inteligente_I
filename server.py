@@ -20,7 +20,6 @@ CANVAS_WIDTH = 600
 CANVAS_HEIGHT = 600
 MAP_DIR = "maps/"
 DEFAULT_ALGORITHM = "BFS"
-DEFAULT_PRIORITY = "← ↑ → ↓"
 DEFAULT_HEURISTIC = "Manhattan"
 
 def get_map_file_path():
@@ -52,19 +51,10 @@ def create_simulation_params(width, height, map_file_name):
         "algorithm": Choice(
             name='Método de búsqueda',
             description="Seleccione el método de búsqueda para llegar a la meta",
-            choices=["BFS", "DFS", "UC", "A*", "Hill Climbing", "Beam Search", "MinMax1", "MinMax2"],
+            choices=["BFS", "DFS", "UC", "A*", "Hill Climbing", "Beam Search", "MiniMaxPodaAlfaBeta"],
             value=DEFAULT_ALGORITHM
         ),
-        "priority": Choice(
-            name='Prioridad de búsqueda',
-            description="Seleccione el orden de prioridad de búsqueda que tendrá el agente",
-            choices=[
-                "→ ↓ ↑ ←", "→ ↑ ← ↓", "↑ → ← ↓", "↑ ← ↓ →", 
-                "↓ ↑ → ←", "↓ ← → ↑", "← → ↓ ↑", "← ↓ ↑ →",
-                "← ↑ → ↓"
-            ],
-            value=DEFAULT_PRIORITY
-        ),
+        "priority": Choice(name='Seleccionar prioridad', value='Izq Arr Der Aba', choices=["Der Aba Arr Izq", "Der Arr Izq Aba", "Arr Der Izq Aba", "Izq Der Aba Arr", "Izq Arr Der Aba"], description='Seleccionar prioridad de movimiento'),
         "heuristic": Choice(
             name='Heuristica',
             description="Selecciona la heuristica para algoritmos informados",
@@ -72,14 +62,14 @@ def create_simulation_params(width, height, map_file_name):
             value=DEFAULT_HEURISTIC
         ),
         "goal_pos": Choice(
-            name = "Posición de la meta",
-            description= "Selecciona en que lugar se va a encontrar la meta",
-            choices = rocks + ["Aleatorio"],
-            value = "Aleatorio"
+            name = "--",
+            description= "--",
+            choices = rocks + ["--"],
+            value = "--"
         ),
         "difficulty": Choice(
-            name = "Escoger dificultad",
-            description="Se escoge el nivel de dificultad de juego",
+            name = "Dificultad",
+            description="Dificultad del enemigo",
             choices= [1, 2, 3],
             value = 1
         )

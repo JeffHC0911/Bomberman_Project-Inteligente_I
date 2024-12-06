@@ -13,7 +13,7 @@ class enemy(Agent):
     
     def step(self) -> None:
             
-            if self.search_type != "MinMax1" and not self.search_type == "MinMax2":
+            if self.search_type != "MinMax1" and not self.search_type == "MiniMaxPodaAlfaBeta":
                 step = RandomMove(self.model.grid, self.pos, self.model.goal, self.priority, "")
                 step = step.find_path()
                 self.model.grid.move_agent(self, step)

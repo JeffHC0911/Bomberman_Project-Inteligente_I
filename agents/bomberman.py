@@ -41,7 +41,7 @@ class bomberman(Agent):
                     self.model.grid.remove_agent(agent)
                     self.model.schedule.remove(agent)
 
-            if self.pos != self.model.goal and (not self.search_type == "MinMax1" and not self.search_type == "MinMax2"):
+            if self.pos != self.model.goal and (not self.search_type == "MinMax1" and not self.search_type == "MiniMaxPodaAlfaBeta" and self.model.difficulty == 1):
                 self.move_towards_goal()
             # else:
             #     enemy_positions_list, _ = self.model.get_enemy_positions()
