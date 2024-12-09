@@ -1,5 +1,0 @@
-B,C,C,M,C,C,C
-C,M,C,C,C,M,C
-E,C,M,M,C,M,C_g
-C,M,C,C,C,M,C
-C,C,M,C,C,C,C

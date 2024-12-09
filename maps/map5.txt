@@ -1,8 +1,0 @@
-M,M,M,M,M,M,M,M
-M,B,C,C,E,C,C,M
-M,C,C,C,C,C,C,M
-M,C,C,C,C,C,C,M
-M,R,C,R,R,C,C,M
-M,R,C,R,R,C,C,M
-M,C,C,C,C,C,C_g,M
-M,M,M,M,M,M,M,M
